@@ -20,10 +20,35 @@ add_capability("passive_check_masquerading",1);
 // REQUEST FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////
+// REQUEST FUNCTIONS
+////////////////////////////////////////////////////////////////////////
+
+$escape_request_vars=true;
+
+function map_htmlentities($arrval){
+
+	if(is_array($arrval)){
+		return array_map('map_htmlentities',$arrval);
+		}
+	else
+		return htmlentities($arrval,ENT_QUOTES);
+	}
+function map_htmlentitydecode($arrval){
+
+	if(is_array($arrval)){
+		return array_map('map_htmlentitydecode',$arrval);
+		}
+	else
+		return html_entity_decode($arrval,ENT_QUOTES);
+	}
+
+
 // grabs POST and GET variables
 function grab_request_vars($preprocess=true,$type=""){
+	global $escape_request_vars;
 	global $request;
-
+	
 	// do we need to strip slashes?
 	$strip=false;
 	if((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || (ini_get('magic_quotes_sybase') && (strtolower(ini_get('magic_quotes_sybase'))!= "off")))
@@ -33,14 +58,35 @@ function grab_request_vars($preprocess=true,$type=""){
 
 	if($type=="" || $type=="get"){
 		foreach ($_GET as $var => $val){
-			$request[$var]=$val;
-//			echo "GET: $var = $val<BR>\n";
+			if($escape_request_vars==true){
+				if(is_array($val)){
+					$request[$var]=array_map('map_htmlentities',$val);
+					}
+				else
+					$request[$var]=htmlentities($val,ENT_QUOTES);
+				}
+			else
+				$request[$var]=$val;
+			//echo "GET: $var = \n";
+			//print_r($val);
+			//echo "<BR>";
 			}
 		}
 	if($type=="" || $type=="post"){
 		foreach ($_POST as $var => $val){
-			$request[$var]=$val;
-//			echo "POST: $var = $val<BR>\n";
+			if($escape_request_vars==true){
+				if(is_array($val)){
+					//echo "PROCESSING ARRAY $var<BR>";
+					$request[$var]=array_map('map_htmlentities',$val);
+					}
+				else
+					$request[$var]=htmlentities($val,ENT_QUOTES);
+				}
+			else
+				$request[$var]=$val;
+			//echo "POST: $var = ";
+			//print_r($val);
+			//echo "<BR>\n";
 			}
 		}
 		
@@ -49,8 +95,50 @@ function grab_request_vars($preprocess=true,$type=""){
 		foreach($request as $var => $val)
 			$request[$var]=stripslashes($val);
 		}
+	
 		
+	if($preprocess==true)
+		preprocess_request_vars();
 	}
+
+function grab_request_var($varname,$default=""){
+	global $request;
+	global $escape_request_vars;
+	
+	$v=$default;
+	if(isset($request[$varname])){
+		if($escape_request_vars==true && $request_vars_decoded==false){
+			if(is_array($request[$varname])){
+				//echo "PROCESSING ARRAY [$varname] =><BR>";
+				//print_r($request[$varname]);
+				//echo "<BR>";
+				$v=array_map('map_htmlentitydecode',$request[$varname]);
+				}
+			else
+				$v=html_entity_decode($request[$varname],ENT_QUOTES);
+			}
+		else
+			$v=$request[$varname];
+		}
+	//echo "VAR $varname = $v<BR>";
+	return $v;
+	}
+	
+function decode_request_vars(){
+	global $request;
+	global $request_vars_decoded;
+	
+	$newarr=array();
+	foreach($request as $var => $val){
+		$newarr[$var]=grab_request_var($var);
+		}
+		
+	$request_vars_decoded=true;
+		
+	$request=$newarr;
+	}
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // OUTPUT FUNCTIONS
@@ -59,9 +147,11 @@ function grab_request_vars($preprocess=true,$type=""){
 function have_value($var){
 	if(!isset($var))
 		return false;
-	if(is_null($var))
+	else if(is_null($var))
 		return false;
-	if(empty($var))
+	else if(empty($var))
+		return false;
+	else if($var=="")
 		return false;
 	return true;
 	}
