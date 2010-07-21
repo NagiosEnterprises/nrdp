@@ -64,15 +64,15 @@ function submit_nagios_command($raw=false){
 		handle_api_error(ERROR_NO_COMMAND);
 
 	// make sure we can write to external command file
-	if(!isset($instance_array["command_file"]))
+	if(!isset($cfg["command_file"]))
 		handle_api_error(ERROR_NO_COMMAND_FILE);
-	if(!file_exists($instance_array["command_file"]))
+	if(!file_exists($cfg["command_file"]))
 		handle_api_error(ERROR_BAD_COMMAND_FILE);
-	if(!is_writeable($instance_array["command_file"]))
+	if(!is_writeable($cfg["command_file"]))
 		handle_api_error(ERROR_COMMAND_FILE_OPEN_WRITE);
 		
 	// open external command file
-	if(($handle=@fopen($instance_array["command_file"],"w+"))===false)
+	if(($handle=@fopen($cfg["command_file"],"w+"))===false)
 		handle_api_error(ERROR_COMMAND_FILE_OPEN);
 		
 	// get current time
@@ -114,13 +114,24 @@ function submit_nagios_command($raw=false){
 	
 function submit_check_data(){
 	global $cfg;
+	global $request;
 	
-	echo "REQUEST:<BR>";
-	print_r($request);
-	echo "<BR>";
+	$debug=false;
+	
+	if($debug){
+		echo "REQUEST:<BR>";
+		print_r($request);
+		echo "<BR>";
+		}
 	
 	// check results are passed as XML data
 	$xmldata=grab_request_var("XMLDATA");
+	
+	if($debug){
+		echo "XMLDATA:<BR>";
+		print_r($xmldata);
+		echo "<BR>";
+		}
 	
 	// make sure we have data
 	if(!have_value($xmldata))
@@ -128,17 +139,21 @@ function submit_check_data(){
 		
 	// convert to xml
 	$xml=@simplexml_load_string($xmldata);
-	if(!xml)
+	if(!$xml){
+		print_r(libxml_get_errors());
 		handle_api_error(ERROR_BAD_XML);
+		}
 		
-	echo "OUR XML:<BR>";
-	print_r($xml);
-	echo "<BR>";
+	if($debug){
+		echo "OUR XML:<BR>";
+		print_r($xml);
+		echo "<BR>";
+		}
 
 	// make sure we can write to check results dir
-	if(!isset($instance_array["check_results_dir"]))
+	if(!isset($cfg["check_results_dir"]))
 		handle_api_error(ERROR_NO_CHECK_RESULTS_DIR);
-	if(!file_exists($instance_array["check_results_dir"]))
+	if(!file_exists($cfg["check_results_dir"]))
 		handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
 		
 	$total_checks=0;
@@ -165,19 +180,19 @@ function submit_check_data(){
 			
 		////// WRITE THE CHECK RESULT //////
 		// create a temp file to write to
-		$tmpname=tempname($cfg["check_results_dir"],"check");
+		$tmpname=tempnam($cfg["check_results_dir"],"check");
 		$fh=fopen($tmpname,"w");
 		
 		fprintf($fh,"### NRDP Check ###\n");
-		fprintf($fh,"# Time: %s\n",date());
+		fprintf($fh,"# Time: %s\n",date('r'));
 		fprintf($fh,"host_name=%s\n",$hostname);
 		if($type=="service")
 			fprintf($fh,"service_description=%s\n",$servicename);
 		fprintf($fh,"check_type=1\n"); // 0 for active, 1 for passive
-		fprintf($fh,"early_timeout=1\n")
+		fprintf($fh,"early_timeout=1\n");
 		fprintf($fh,"exited_ok=1\n");
 		fprintf($fh,"return_code=%d\n",$state);
-		fprintf($fh,"output=%s\n",$output);
+		fprintf($fh,"output=%s\\n\n",$output);
 		
 		// close the file and rename it, so Nagios Core picks it up
 		fclose($fh);
@@ -185,13 +200,16 @@ function submit_check_data(){
 		
 		$total_checks++;
 		}
-			
+	
+	
 	output_api_header();
 	
 	echo "<result>\n";
 	echo "  <status>0</status>\n";
 	echo "  <message>OK</message>\n";
-	echo "  <meta>".$total_checks." checks processed.</meta>\n"
+	echo "    <meta>\n";
+	echo "       <output>".$total_checks." checks processed.</output>\n";
+	echo "    </meta>\n";
 	echo "</result>\n";
 	}
 
@@ -210,36 +228,41 @@ function say_hello(){
 
 
 function display_form(){
+
+	$mytoken="test";
 ?>
 	<strong>Submit Nagios Command:</strong><br>
 	<form action="" method="get">
-	<input type="hidden" name="cmd" value"submitcmd">
+	<input type="hidden" name="cmd" value="submitcmd">
+	<input type="hidden" name="token" value="<?php echo $mytoken;?>">
 	Command: <input type="text" name="command" size="15" value="DISABLE_HOST_NOTIFICATIONS;somehost"><br>
 	<input type="submit" name="btnSubmit" value="Submit Command">
 	</form>
 	
 	<strong>Submit Check Data</strong><br>
 	<form action="" method="post">
-	<input type="hidden" name="cmd" value"submitcheck">
+	<input type="hidden" name="cmd" value="submitcheck">
+	<input type="hidden" name="token" value="<?php echo $mytoken;?>">
 	Check Data:<br>
 <?php
 $xml="
+<?xml version='1.0'?> 
 <checkresults>
 	<checkresult type='host'>
 		<hostname>somehost</hostname>
 		<state>0</state>
 		<output>Everything looks okay!|perfdata</output>
-	<checkresult>
+	</checkresult>
 	<checkresult type='service'>
 		<hostname>somehost</hostname>
 		<servicename>someservice</servicename>
 		<state>1</state>
 		<output>WARNING: Danger Will Robinson!|perfdata</output>
-	<checkresult>
+	</checkresult>
 </checkresults>
 ";
 ?>
-<textarea cols="30" rows="5" name="XMLDATA"><?php echo htmlentities($xml);?></textarea>
+<textarea cols="50" rows="10" name="XMLDATA"><?php echo htmlentities($xml);?></textarea><br>
 	<input type="submit" name="btnSubmit" value="Submit Check Data">
 	</form>
 <?php

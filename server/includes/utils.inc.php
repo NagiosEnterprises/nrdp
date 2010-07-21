@@ -8,14 +8,6 @@
 require_once("constants.inc.php");
 
 
-add_capability("direct_nagios_command",1);
-add_capability("bulk_nagios_command",1);
-add_capability("soft_process_control",1);
-add_capability("hard_process_control",1);
-add_capability("check_result_spool_dump",1);
-add_capability("passive_check_handler",1);
-add_capability("passive_check_masquerading",1);
-	
 ////////////////////////////////////////////////////////////////////////
 // REQUEST FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
@@ -25,6 +17,7 @@ add_capability("passive_check_masquerading",1);
 ////////////////////////////////////////////////////////////////////////
 
 $escape_request_vars=true;
+$request_vars_decoded=false;
 
 function map_htmlentities($arrval){
 
@@ -96,14 +89,17 @@ function grab_request_vars($preprocess=true,$type=""){
 			$request[$var]=stripslashes($val);
 		}
 	
-		
+
+	/*
 	if($preprocess==true)
 		preprocess_request_vars();
+	*/
 	}
 
 function grab_request_var($varname,$default=""){
 	global $request;
 	global $escape_request_vars;
+	global $request_vars_decoded;
 	
 	$v=$default;
 	if(isset($request[$varname])){
