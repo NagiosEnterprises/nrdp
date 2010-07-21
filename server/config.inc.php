@@ -6,10 +6,10 @@
 
 
 // an array of one or more tokens that are valid for this NRDP install
-// a client request must contain a valid token in order for the DRDP to response or honor the request
+// a client request must contain a valid token in order for the NRDP to response or honor the request
 $cfg['authorized_tokens'] = array(
-	"test",
-	"welcome"
+	"90dfs7jwn3",
+	"mysecrettoken",
 	);
 	
 // do we require that HTTPS be used to access NRDP?
