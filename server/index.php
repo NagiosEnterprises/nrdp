@@ -32,6 +32,10 @@ function route_request(){
 		case "submitcmd":
 			submit_nagios_command(false);
 			break;
+		// check data
+		case "submitcheck":
+			submit_check_data();
+			break;
 		// say hello
 		case "hello":
 			say_hello();
@@ -103,9 +107,41 @@ function submit_nagios_command($raw=false){
 	echo "</result>\n";
 	}
 
+	
+function submit_check_data(){
+	global $cfg;
+	
+	$xmldata=grab_request_var("XMLDATA");
+	
+	// make sure we have data
+	if(!have_value($xmldata))
+		handle_api_error(ERROR_NO_DATA);
+		
+	// convert to xml
+	$xml=@simplexml_load_string($xmldata);
+	if(!xml)
+		handle_api_error(ERROR_BAD_XML);
+		
+	echo "OUR XML:<BR>";
+	print_r($xml);
+	echo "<BR>";
+
+	// make sure we can write to check results dir
+	if(!isset($instance_array["check_results_dir"]))
+		handle_api_error(ERROR_NO_CHECK_RESULTS_DIR);
+	if(!file_exists($instance_array["check_results_dir"]))
+		handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
+			
+	output_api_header();
+	
+	echo "<result>\n";
+	echo "  <status>0</status>\n";
+	echo "  <message>OK</message>\n";
+	echo "</result>\n";
+	}
+
 
 function say_hello(){
-	global $cfg;
 	
 	output_api_header();
 	
