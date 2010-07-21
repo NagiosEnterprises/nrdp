@@ -229,7 +229,6 @@ function handle_api_error($msg){
 
 function check_auth(){
 	global $cfg;
-	global $request;
 
 	// HTTPS is required
 	if(!isset($cfg["require_https"]) || $cfg["require_https"]!==false){
@@ -246,12 +245,17 @@ function check_auth(){
 				handle_api_error(ERROR_BAD_USER);
 			}
 		}
+
+	}
+
+	
+function check_token(){
+	global $cfg;
+
 	
 	// user must supply a token
-	$user_token="";
-	if(isset($request["token"]) && have_value($request["token"]))
-		$user_token=$request["token"];
-	else
+	$user_token=grab_request_var("token");
+	if(!have_value($user_token))
 		handle_api_error(ERROR_NO_TOKEN_SUPPLIED);
 		
 	// no valid tokens are configured
@@ -278,35 +282,5 @@ function get_product_version(){
 	return $cfg['product_version'];
 	}
 
-
-/////////////////////////////////////////////////
-// CAPABILITIES
-/////////////////////////////////////////////////
-
-function add_capability($cname,$cval=""){
-	global $cfg;
-	
-	if(!isset($cfg["capabilities"]))
-		$cfg["capabilities"]=array();
-		
-	// don't override user-specified values
-	if(!isset($cfg["capabilities"][$cname]))
-		$cfg["capabilities"][$cname]=$cval;
-	}
-
-function capability_enabled($cname){
-	global $cfg;
-	
-	if(!isset($cfg["capabilities"]))
-		return false;
-		
-	if(!isset($cfg["capabilities"][$cname]))
-		return false;
-		
-	if($cfg["capabilities"][$cname]===1)
-		return true;
-		
-	return false;
-	}
 
 ?>

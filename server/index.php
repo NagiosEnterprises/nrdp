@@ -1,7 +1,7 @@
 <?php
 //
-// Nagios Distributed Control Manager
-// Copyright (c) 2008 Nagios Enterprises, LLC.  All rights reserved.
+// Nagios Remote Data Processor (NRDP)
+// Copyright (c) 2010 Nagios Enterprises, LLC.  All rights reserved.
 //
 // $Id: index.php 12 2010-06-19 04:19:35Z egalstad $
 
@@ -21,6 +21,10 @@ route_request();
 function route_request(){
 	
 	$cmd=strtolower(grab_request_var("cmd"));
+	
+	// token if required for most everyting
+	if($cmd!="" && $cmd!="hello")
+		check_token();
 		
 	switch($cmd){
 	
@@ -111,6 +115,11 @@ function submit_nagios_command($raw=false){
 function submit_check_data(){
 	global $cfg;
 	
+	echo "REQUEST:<BR>";
+	print_r($request);
+	echo "<BR>";
+	
+	// check results are passed as XML data
 	$xmldata=grab_request_var("XMLDATA");
 	
 	// make sure we have data
@@ -131,12 +140,58 @@ function submit_check_data(){
 		handle_api_error(ERROR_NO_CHECK_RESULTS_DIR);
 	if(!file_exists($instance_array["check_results_dir"]))
 		handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
+		
+	$total_checks=0;
+		
+	// process each result
+	foreach($xml->checkresult as $cr){
+	
+		// get check result type
+		$type="host";
+		foreach($cr->attributes() as $var => $val){
+			if($var=="type")
+				$type=strval($val);
+			}
+			
+		// common elements
+		$hostname=strval($cr->hostname);
+		$state=intval($cr->state);
+		$output=strval($cr->output);
+		
+		// service checks
+		if($type=="service"){
+			$servicename=strval($cr->servicename);
+			}
+			
+		////// WRITE THE CHECK RESULT //////
+		// create a temp file to write to
+		$tmpname=tempname($cfg["check_results_dir"],"check");
+		$fh=fopen($tmpname,"w");
+		
+		fprintf($fh,"### NRDP Check ###\n");
+		fprintf($fh,"# Time: %s\n",date());
+		fprintf($fh,"host_name=%s\n",$hostname);
+		if($type=="service")
+			fprintf($fh,"service_description=%s\n",$servicename);
+		fprintf($fh,"check_type=1\n"); // 0 for active, 1 for passive
+		fprintf($fh,"early_timeout=1\n")
+		fprintf($fh,"exited_ok=1\n");
+		fprintf($fh,"return_code=%d\n",$state);
+		fprintf($fh,"output=%s\n",$output);
+		
+		// close the file and rename it, so Nagios Core picks it up
+		fclose($fh);
+		rename($tmpname,$tmpname.".ok");
+		
+		$total_checks++;
+		}
 			
 	output_api_header();
 	
 	echo "<result>\n";
 	echo "  <status>0</status>\n";
 	echo "  <message>OK</message>\n";
+	echo "  <meta>".$total_checks." checks processed.</meta>\n"
 	echo "</result>\n";
 	}
 
