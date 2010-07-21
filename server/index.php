@@ -116,7 +116,7 @@ function submit_check_data(){
 	global $cfg;
 	global $request;
 	
-	$debug=false;
+	$debug=true;
 	
 	if($debug){
 		echo "REQUEST:<BR>";
@@ -180,7 +180,7 @@ function submit_check_data(){
 			
 		////// WRITE THE CHECK RESULT //////
 		// create a temp file to write to
-		$tmpname=tempnam($cfg["check_results_dir"],"check");
+		$tmpname=tempnam($cfg["check_results_dir"],"c");
 		$fh=fopen($tmpname,"w");
 		
 		fprintf($fh,"### NRDP Check ###\n");
@@ -194,9 +194,16 @@ function submit_check_data(){
 		fprintf($fh,"return_code=%d\n",$state);
 		fprintf($fh,"output=%s\\n\n",$output);
 		
-		// close the file and rename it, so Nagios Core picks it up
+		// close the file
 		fclose($fh);
-		rename($tmpname,$tmpname.".ok");
+		
+		// change ownership and perms
+		chgrp($tmpname,$cfg["nagios_command_group"]);
+		chmod($tmpname,0770);
+		
+		// create an ok-to-go, so Nagios Core picks it up
+		$fh=fopen($tmpname.".ok","w+");
+		fclose($fh);
 		
 		$total_checks++;
 		}
