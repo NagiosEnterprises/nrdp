@@ -1,16 +1,15 @@
 <?php
 //
-// Nagios DCM Utils
-// Copyright (c) 2008 Nagios Enterprises, LLC.  All rights reserved.
+// NRDP Utils
+// Copyright (c) 2008-2010 Nagios Enterprises, LLC.  All rights reserved.
 //
 // $Id: utils.inc.php 12 2010-06-19 04:19:35Z egalstad $
 
 require_once("constants.inc.php");
 
+if(!defined("callbacks"))
+	$callbacks=array();
 
-////////////////////////////////////////////////////////////////////////
-// REQUEST FUNCTIONS
-////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 // REQUEST FUNCTIONS
@@ -140,18 +139,6 @@ function decode_request_vars(){
 // OUTPUT FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-function have_value($var){
-	if(!isset($var))
-		return false;
-	else if(is_null($var))
-		return false;
-	else if(empty($var))
-		return false;
-	else if($var=="")
-		return false;
-	return true;
-	}
-	
 
 // generate output header
 function output_api_header(){
@@ -175,6 +162,30 @@ function output_api_header(){
 // MISC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
+function have_value($var){
+	if(!isset($var))
+		return false;
+	else if(is_null($var))
+		return false;
+	else if(empty($var))
+		return false;
+	else if($var=="")
+		return false;
+	return true;
+	}
+	
+// gets value from array using default
+function grab_array_var($arr,$varname,$default=""){
+	global $request;
+	
+	$v=$default;
+	if(is_array($arr)){
+		if(array_key_exists($varname,$arr))
+			$v=$arr[$varname];
+		}
+	return $v;
+	}
+	
 function xmlentities($uncleaned){
 
 	$search=array(
@@ -278,5 +289,52 @@ function get_product_version(){
 	return $cfg['product_version'];
 	}
 
+////////////////////////////////////////////////////////////////////////
+// CALLBACK FUNCTIONS
+////////////////////////////////////////////////////////////////////////
+
+//function do_callbacks($cbtype,$args=null){
+function do_callbacks($cbtype,&$args){
+	global $callbacks;
+	
+	$total_callbacks=0;
+	
+	//echo "HANDLING CALLBACK TYPE $cbtype<BR>\n";
+	//print_r($callbacks);
+	
+	if(array_key_exists($cbtype,$callbacks)){
+		foreach($callbacks[$cbtype] as $cb){
+			//echo "CALLING $cb<BR>\n";
+			$cb($cbtype,$args);
+			$total_callbacks++;
+			}
+		}
+		
+	return $total_callbacks;
+	}
+	
+	
+function count_callbacks($cbtype){
+	global $callbacks;
+	
+	$total_callbacks=0;
+	
+	if(array_key_exists($cbtype,$callbacks)){
+		$total_callbacks=count($callbacks[$cbtype]);
+		}
+		
+	return $total_callbacks;
+	}	
+	
+	
+function register_callback($cbtype,$func){
+	global $callbacks;
+	
+	$callbacks[$cbtype][]=$func;
+	
+	//echo "CALLBACKS:<BR>";
+	//print_r($callbacks);
+	//echo "<BR>";
+	}
 
 ?>
