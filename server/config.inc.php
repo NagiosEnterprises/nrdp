@@ -1,15 +1,16 @@
 <?php
 // NRDP Config File
-// Copyright (c) 2008 Nagios Enterprises, LLC.  All rights reserved.
+// Copyright (c) 2010 Nagios Enterprises, LLC.  All rights reserved.
 //  
 // $Id: config.inc.php 12 2010-06-19 04:19:35Z egalstad $
 
 
 // an array of one or more tokens that are valid for this NRDP install
 // a client request must contain a valid token in order for the NRDP to response or honor the request
+// NOTE: tokens are just alphanumeric strings - make them hard to guess!
 $cfg['authorized_tokens'] = array(
-	"90dfs7jwn3",
-	"mysecrettoken",
+	//"mysecrettoken",  // <-- not a good token
+	//"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
 	);
 	
 // do we require that HTTPS be used to access NRDP?
