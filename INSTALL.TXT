@@ -7,6 +7,7 @@ NRPE Installation Instructions
 	
 2. Copy over server NRDP files from installation directory
 
+	cd nrdp
 	cp -r * /usr/local/nrdp
 	
 3. Set permissions on NRDP dir/files

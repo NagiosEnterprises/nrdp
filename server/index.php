@@ -83,7 +83,7 @@ function display_form(){
 	<form action="" method="get">
 	<input type="hidden" name="cmd" value="submitcmd">
 	Token: <input type="text" name="token" value="" size="15"><br>
-	Command: <input type="text" name="command" size="15" value="DISABLE_HOST_NOTIFICATIONS;somehost"><br>
+	Command: <input type="text" name="command" size="50" value="DISABLE_HOST_NOTIFICATIONS;somehost"><br>
 	<input type="submit" name="btnSubmit" value="Submit Command">
 	</form>
 	
@@ -112,7 +112,7 @@ $xml="
 </checkresults>
 ";
 ?>
-<textarea cols="50" rows="10" name="XMLDATA"><?php echo htmlentities($xml);?></textarea><br>
+<textarea cols="80" rows="15" name="XMLDATA"><?php echo htmlentities($xml);?></textarea><br>
 	<input type="submit" name="btnSubmit" value="Submit Check Data">
 	</form>
 <?php
