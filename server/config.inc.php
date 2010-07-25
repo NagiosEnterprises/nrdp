@@ -11,11 +11,10 @@
 $cfg['authorized_tokens'] = array(
 	//"mysecrettoken",  // <-- not a good token
 	//"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
-	"mytoken",
 	);
 	
 // do we require that HTTPS be used to access NRDP?
-// set this value to 'false' to disable HTTPS requirement (not recommended)
+// set this value to 'false' to disable HTTPS requirement
 $cfg["require_https"]=false;
 
 // do we require that basic authentication be used to access NRDP?
@@ -25,7 +24,7 @@ $cfg["require_basic_auth"]=false;
 // what basic authentication users are allowed to access NRDP?
 // comment this variable out to allow all authenticated users access to the NRDP
 $cfg["valid_basic_auth_users"]=array(
-	"dcmuser"
+	"nrdpuser"
 	);
 	
 // the name of the system group that has write permissions to the external command file
