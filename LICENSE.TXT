@@ -1,0 +1,20 @@
+Nagios Open Software License Version 1.0
+
+Copyright (c) 2008-2010 Nagios Enterprises, LLC
+
+Permission is hereby granted, free of charge, to any person, company, or legal entity (each a "User") obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software (each a "Use"), and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+i. The above copyright notice and this license shall be included in its entirety in all copies or substantial portions of the Software.
+
+ii. The copyright notices and attribution information included in the Software may not be altered or removed.
+
+iii. The Software may not be Forked.  "Forking" and "to Fork" means to create or distribute a product or a derivative work of the object or source code of the Software under a new or different brand. 
+
+iv. Any Use of the Software is subject to compliance with the terms and conditions of the Nagios Trademark Use Restrictions, which can be viewed online at http://www.nagios.com/legal/trademarks/
+
+v. This license is not intended to restrict any other rights that may be granted to you by other software and associated documentation files that may be included in the Software.  If the Software is considered to be a collective work under U.S. copyright laws, the terms of this license do not apply to contributions of the collective work unless stated otherwise.
+
+vi. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+vii. The terms of this license are subject to the User's compliance with all terms of this license.  In the event that any term or condition is violated by the User, the terms of this license terminate and the User shall not have any rights they otherwise might have been granted under this license.
+

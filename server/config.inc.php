@@ -1,6 +1,7 @@
 <?php
 // NRDP Config File
-// Copyright (c) 2010 Nagios Enterprises, LLC.  All rights reserved.
+// Copyright (c) 2010 Nagios Enterprises, LLC.
+// License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //  
 // $Id: config.inc.php 12 2010-06-19 04:19:35Z egalstad $
 

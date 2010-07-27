@@ -1,7 +1,8 @@
 <?php
 //
-// Nagios DCM Constants
-// Copyright (c) 2008 Nagios Enterprises, LLC.  All rights reserved.
+// NRDP Constants
+// Copyright (c) 2008 Nagios Enterprises, LLC.
+// License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
 // $Id: constants.inc.php 12 2010-06-19 04:19:35Z egalstad $
 

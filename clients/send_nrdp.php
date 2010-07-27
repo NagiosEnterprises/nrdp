@@ -3,6 +3,8 @@
 // send_nrdp.php
 //
 // Copyright (c) 2010 Nagios Enterprises, LLC.
+// Portions Copyright (c) others - see source code below.
+// License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //  
 
 doit();
@@ -15,11 +17,12 @@ $service="";
 $state="";
 $output="";
 $type="host";
+$checktype=1; // passive check
 
 	
 function doit(){
 	global $argv;
-	global $url,$token,$host,$service,$state,$output,$type;
+	global $url,$token,$host,$service,$state,$output,$type,$checktype;
 	
 	$type="host";
 	
@@ -30,6 +33,7 @@ function doit(){
 	echo "URL=$url\n";
 	echo "TOKEN=$token\n";
 	echo "TYPE=$type\n";
+	echo "CHECKTYPE=$checktype\n";
 	echo "HOST=$host\n";
 	echo "SERVICE=$service\n";
 	echo "STATE=$state\n";
@@ -37,10 +41,12 @@ function doit(){
 	*/
 	
 	// craft the XML to send
+	$checkresultopts="";
+	$checkresultopts=" checktype='".$checktype."'";
 	$xml=
 "<?xml version='1.0'?> 
 <checkresults>
-	<checkresult type='".$type."'>
+	<checkresult type='".$type."' ".$checkresultopts.">
 		<hostname>".htmlentities($host)."</hostname>
 ";
 if($type=="service")
@@ -76,7 +82,7 @@ $xml.="		<state>".$state."</state>
 	
 function check_args($args){
 	global $argv;
-	global $url,$token,$host,$service,$state,$output,$type;
+	global $url,$token,$host,$service,$state,$output,$type,$checktype;
 	
 	$error=false;
 	
@@ -85,6 +91,7 @@ function check_args($args){
 	// get values
 	$url=grab_array_var($args,"url");
 	$token=grab_array_var($args,"token");
+	$checktype=grab_array_var($args,"checktype",1);
 	$host=grab_array_var($args,"host");
 	$service=grab_array_var($args,"service");
 	$state=grab_array_var($args,"state");
@@ -103,6 +110,8 @@ function check_args($args){
 	if($error){
 		echo "send_nrdp - NRDP Host and Service Check Client\n";
 		echo "Copyright (c) 2010 Nagios Enterprises, LLC\n";
+		echo "Portions Copyright (c) others - see source code\n";
+		echo "License: Nagios Open Software License <http://www.nagios.com/legal/licenses>\n";
 		echo "\n";
 		echo "Usage: ".$argv[0]." --url=<url> --token=<token> --host=<hostname> [--service=<servicename>] --state=<state> --output=<output>\n";
 		echo "\n";
@@ -131,6 +140,48 @@ function grab_array_var($arr,$varname,$default=""){
 		}
 	return $v;
 	}
+	
+	
+function parse_argv($argv){
+
+    array_shift($argv);
+    $out=array();
+	
+    foreach($argv as $arg){
+	
+        if(substr($arg,0,2)=='--'){
+			$eq=strpos($arg,'=');
+            if($eq===false){
+                $key=substr($arg,2);
+                $out[$key]=isset($out[$key])?$out[$key]:true;
+				} 
+			else{
+                $key=substr($arg,2,$eq-2);
+                $out[$key]=substr($arg,$eq+1);
+				}
+			} 
+			
+		else if(substr($arg,0,1)=='-'){
+            if(substr($arg,2,1)=='='){
+                $key=substr($arg,1,1);
+                $out[$key]=substr($arg,3);
+				}
+			else{
+                $chars=str_split(substr($arg,1));
+                foreach($chars as $char){
+                    $key=$char;
+                    $out[$key]=isset($out[$key])?$out[$key]:true;
+					}
+				}
+			} 
+		else{
+            $out[] = $arg;
+			}
+		}
+		
+    return $out;
+	}
+	
 	
 
 /**
@@ -291,43 +342,5 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
 }
 
 
-function parse_argv($argv){
-    array_shift($argv);
-    $out=array();
-    foreach($argv as $arg){
-	
-        if(substr($arg,0,2)=='--'){
-			$eq=strpos($arg,'=');
-            if($eq===false){
-                $key=substr($arg,2);
-                $out[$key]=isset($out[$key])?$out[$key]:true;
-				} 
-			else{
-                $key=substr($arg,2,$eq-2);
-                $out[$key]=substr($arg,$eq+1);
-				}
-			} 
-			
-		else if(substr($arg,0,1)=='-'){
-            if(substr($arg,2,1)=='='){
-                $key=substr($arg,1,1);
-                $out[$key]=substr($arg,3);
-				}
-			else{
-                $chars=str_split(substr($arg,1));
-                foreach($chars as $char){
-                    $key=$char;
-                    $out[$key]=isset($out[$key])?$out[$key]:true;
-					}
-				}
-			} 
-		else{
-            $out[] = $arg;
-			}
-		}
-		
-    return $out;
-	}
-	
 
 ?>
