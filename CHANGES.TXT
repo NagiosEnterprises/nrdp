@@ -1,3 +1,9 @@
+1.1 - 12/15/2010
+----------------
+- Fixed syntax errors in server index.php file (Jean-François Burdet)
+- Fixed problem with passive checks not having proper timestamps (Jean-François Burdet)
+
+
 1.0 - 07/30/2010
 ----------------
 - Hello world!
