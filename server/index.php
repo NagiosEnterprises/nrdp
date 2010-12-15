@@ -60,7 +60,6 @@ function route_request(){
 	}
 
 
-<<<<<<< .mine
 function submit_nagios_command($raw=false){
 	global $cfg;
 	
@@ -238,8 +237,7 @@ function submit_check_data(){
 	}
 
 
-=======
->>>>>>> .r11
+
 function say_hello(){
 	
 	output_api_header();
