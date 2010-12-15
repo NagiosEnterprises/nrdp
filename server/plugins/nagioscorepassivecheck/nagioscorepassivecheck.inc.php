@@ -101,6 +101,7 @@ function nagioscorepassivecheck_submit_check_data(){
 		$fh=fopen($tmpname,"w");
 		
 		fprintf($fh,"### NRDP Check ###\n");
+		fprintf($fh,"start_time=%d.0\n",time());
 		fprintf($fh,"# Time: %s\n",date('r'));
 		fprintf($fh,"host_name=%s\n",$hostname);
 		if($type=="service")
