@@ -2,7 +2,7 @@
 <?
 // send_nrdp.php
 //
-// Copyright (c) 2010 Nagios Enterprises, LLC.
+// Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 // Portions Copyright (c) others - see source code below.
 /* License:
 
@@ -26,11 +26,13 @@ $state="";
 $output="";
 $type="host";
 $checktype=1; // passive check
+$delim="\t";  // stdin delimiter
 
 	
 function doit(){
 	global $argv;
-	global $url,$token,$host,$service,$state,$output,$type,$checktype;
+	global $url,$token,$host,$service,$state,$output,$type,$checktype,$usestdin;
+	global $delim;
 	
 	$type="host";
 	
@@ -48,25 +50,117 @@ function doit(){
 	echo "OUTPUT=".$output."\n";
 	*/
 	
+	$hostchecks=array();
+	$servicechecks=array();
+	
+	// process single check from command line
+	if($host!=""){
+		// service check
+		if($service!=""){
+			$newc=array(
+				"hostname" => $host,
+				"servicename" => $service,
+				"state" => $state,
+				"output" => $output,
+				);
+			$servicechecks[]=$newc;
+			}
+		// host check
+		else{
+			$newc=array(
+				"hostname" => $host,
+				"state" => $state,
+				"output" => $output,
+				);
+			$hostchecks[]=$newc;
+			}
+		}
+		
+	// use read from stdin
+	if($usestdin!=""){
+		//echo "READING FROM STDIN\n";
+		
+		while($buf=rtrim(fgets(STDIN),"\n")){
+			//echo "READ: $buf\n";
+			$parts=explode("\t",$buf);
+			//print_r($parts);
+			$fields=count($parts);
+			
+			// host check
+			if($fields==3){
+				$hostname=$parts[0];
+				$state=$parts[1];
+				$output=$parts[2];
+				
+				$newc=array(
+					"hostname" => $hostname,
+					"state" => $state,
+					"output" => $output,
+					);
+				$hostchecks[]=$newc;
+				}
+			// service check
+			else if($fields==4){
+			
+				$hostname=$parts[0];
+				$servicename=$parts[1];
+				$state=$parts[2];
+				$output=$parts[3];
+				
+				$newc=array(
+					"hostname" => $hostname,
+					"servicename" => $servicename,
+					"state" => $state,
+					"output" => $output,
+					);
+				$servicechecks[]=$newc;
+				}
+			}
+		}
+	
 	// craft the XML to send
 	$checkresultopts="";
 	$checkresultopts=" checktype='".$checktype."'";
-	$xml=
+$xml=
 "<?xml version='1.0'?> 
 <checkresults>
-	<checkresult type='".$type."' ".$checkresultopts.">
-		<hostname>".htmlentities($host)."</hostname>
 ";
-if($type=="service")
-$xml.="		<servicename>".htmlentities($service)."</servicename>
-";
-$xml.="		<state>".$state."</state>
+	foreach($hostchecks as $hc){
+	
+		$hostname=$hc["hostname"];
+		$state=$hc["state"];
+		$output=$hc["output"];
+		
+		$xml.="
+	<checkresult type='host' ".$checkresultopts.">
+		<hostname>".htmlentities($hostname)."</hostname>
+		<state>".$state."</state>
 		<output>".htmlentities($output)."</output>
 	</checkresult>
+		";
+		}
+	foreach($servicechecks as $sc){
+	
+		$hostname=$sc["hostname"];
+		$servicename=$sc["servicename"];
+		$state=$sc["state"];
+		$output=$sc["output"];
+		
+		$xml.="
+	<checkresult type='service' ".$checkresultopts.">
+		<hostname>".htmlentities($hostname)."</hostname>
+		<servicename>".htmlentities($servicename)."</servicename>
+		<state>".$state."</state>
+		<output>".htmlentities($output)."</output>
+	</checkresult>
+		";
+		}
+$xml.="
 </checkresults>
 ";
 
-	//echo "XML=\n$xml\n";
+	echo "XML=\n$xml\n";
+	exit();
 	
 	// build url
 	$theurl=$url."/?token=".$token."&cmd=submitcheck&XMLDATA=".urlencode($xml);
@@ -90,7 +184,7 @@ $xml.="		<state>".$state."</state>
 	
 function check_args($args){
 	global $argv;
-	global $url,$token,$host,$service,$state,$output,$type,$checktype;
+	global $url,$token,$host,$service,$state,$output,$type,$checktype,$usestdin;
 	
 	$error=false;
 	
@@ -104,6 +198,7 @@ function check_args($args){
 	$service=grab_array_var($args,"service");
 	$state=grab_array_var($args,"state");
 	$output=html_entity_decode(grab_array_var($args,"output"),ENT_QUOTES);
+	$usestdin=grab_array_var($args,"usestdin");
 	//$output=grab_array_var($args,"output");
 	
 	//echo "OUTPUT1=".$output."\n";
@@ -112,12 +207,12 @@ function check_args($args){
 		$type="service";
 	
 	// make sure we have required vars
-	if($url=="" || $token=="" || $host=="" || $state=="" || $output=="")
+	if($url=="" || $token=="" || (($usestdin=="")&& ($host=="" || $state=="" || $output=="")))
 		$error=true;
 	
 	if($error){
 		echo "send_nrdp - NRDP Host and Service Check Client\n";
-		echo "Copyright (c) 2010 Nagios Enterprises, LLC\n";
+		echo "Copyright (c) 2010-2011 Nagios Enterprises, LLC\n";
 		echo "Portions Copyright (c) others - see source code\n";
 		echo "License: BSD\n";
 		echo "\n";
