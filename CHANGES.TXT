@@ -1,3 +1,7 @@
+1.2 - 
+----------------
+- Added bulk transfer mode when reading NSCA-style data from STDIN (--usestdin option)
+
 1.1 - 12/15/2010
 ----------------
 - Fixed syntax errors in server index.php file (Jean-François Burdet)
