@@ -159,8 +159,8 @@ $xml.="
 </checkresults>
 ";
 
-	echo "XML=\n$xml\n";
-	exit();
+	//echo "XML=\n$xml\n";
+	//exit();
 	
 	// build url
 	$theurl=$url."/?token=".$token."&cmd=submitcheck&XMLDATA=".urlencode($xml);
@@ -177,7 +177,6 @@ $xml.="
 	//echo "RESULT=\n";
 	//print_r($result);
 	
-		
 	exit(0);
 	}
 	
