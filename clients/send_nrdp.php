@@ -1,5 +1,5 @@
 #!/usr/bin/php -q
-<?
+<?php
 // send_nrdp.php
 //
 // Copyright (c) 2010-2011 Nagios Enterprises, LLC.
