@@ -1,3 +1,8 @@
+1.2.1 - 02/08/2012
+----------------
+- Added bash and python clients - SW
+- Bash client can process STDIN, args, single NRDP formatted file or from directory of NRDP formatted files. -SW
+
 1.2 - 01/31/2011
 ----------------
 - Added bulk transfer mode when reading NSCA-style data from STDIN (--usestdin option)
