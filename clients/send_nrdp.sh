@@ -191,12 +191,16 @@ if [ ! -t 0 ]; then
 				if [ ${#arr[@]} == 4 ]; then
 					xml=$xml"<checkresult type='service' checktype='"$checktype"'>"
 					xml=$xml"<servicename>"${arr[1]}"</servicename>"
+					xml=$xml"<hostname>"${arr[0]}"</hostname>"
+					xml=$xml"<state>"${arr[2]}"</state>"
+					xml=$xml"<output>"${arr[3]}"</output>"
 				else
 					xml=$xml"<checkresult type='host' checktype='"$checktype"'>"
+					xml=$xml"<hostname>"${arr[0]}"</hostname>"
+					xml=$xml"<state>"${arr[1]}"</state>"
+					xml=$xml"<output>"${arr[2]}"</output>"
 				fi
-				xml=$xml"<hostname>"${arr[0]}"</hostname>"
-				xml=$xml"<state>"${arr[2]}"</state>"
-				xml=$xml"<output>"${arr[3]}"</output>"
+				
 				xml=$xml"</checkresult>"
 			fi
 		fi
