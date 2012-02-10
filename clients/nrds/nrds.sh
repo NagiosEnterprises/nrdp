@@ -93,17 +93,17 @@ if [ ! -f $SEND_NRDP ];then
 fi
 
 senddata=""
-tmp=`mktemp $TMPDIR/output.XXXXXX`
 for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
 do
-
-		(eval "$command_prefix ${value[$i]}")>$tmp
+		set +e
+		output=$(eval "$command_prefix ${value[$i]}")
 		status="$?"
-		output=`cat $tmp`
+		set -e
 	if [ "${service[$i]}" == "__HOST__" ];then
 		senddata="$senddata$hostname\t$status\t$output\n"
 	else
 		senddata="$senddata$hostname\t${service[$i]}\t$status\t$output\n"
 	fi
 done
+echo -e $senddata
 echo -e $senddata | $SEND_NRDP -u $URL -t $TOKEN
