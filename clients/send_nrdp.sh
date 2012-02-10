@@ -32,7 +32,7 @@ print_help() {
 		echo ""
 		echo "Options:"
 		echo "	Single Check:"
-		echo "		-h	host name"
+		echo "		-H	host name"
 		echo "		-s	service name"
 		echo "		-S	State"
 		echo "		-o 	output"

@@ -4,7 +4,10 @@
 # 
 #
 ###########################
+
+# Setup Defaults
 CONFIG=./nrds.cfg
+command_prefix=""
 
 PROGNAME=$(basename $0)
 RELEASE="Revision 0.1"
@@ -17,7 +20,7 @@ print_usage() {
 	echo ""
 	echo "$PROGNAME $RELEASE - Sends passive checks to Nagios NRPD server"
 	echo ""
-	echo "Usage: nrds.sh -H hostname [-u /path/to/nrds.cfg]"
+	echo "Usage: nrds.sh -H hostname [-c /path/to/nrds.cfg]"
 	echo ""
     echo "Usage: $PROGNAME -h"
     echo ""
@@ -29,12 +32,6 @@ print_help() {
         echo "This script is used to send passive checks in nrds.cfg"
 		echo "to Nagios NRPD server"
 		echo ""
-		echo "Options:"
-		echo "	Single Check:"
-		echo "		-h	host name"
-		echo "		-s	service name"
-		echo "		-S	State"
-		echo "		-o 	output"
 		exit 0
 }
 
@@ -61,12 +58,14 @@ if [ ! $hostname ]; then
  print_usage
  exit 1
 fi
-
-
+if [ ! -f $CONFIG ];then
+	echo "Could not find config file at "$CONFIG
+	exit 1
+fi
 
 
 # Process the config
-valid_fields=(URL TOKEN TMPDIR SEND_NRDP)
+valid_fields=(URL TOKEN TMPDIR SEND_NRDP command_prefix CONFIG_NAME CONFIG_VERSION)
 i=0
 while read line; do
 if [[ "$line" =~ ^[^\#\;]*= ]]; then
@@ -88,15 +87,23 @@ if [[ "$line" =~ ^[^\#\;]*= ]]; then
 	fi
 fi
 done < $CONFIG
+if [ ! -f $SEND_NRDP ];then
+	echo "Could not find SEND_NRDP file at $SEND_NRDP"
+	exit 1
+fi
+
+senddata=""
 tmp=`mktemp $TMPDIR/output.XXXXXX`
 for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
 do
-	(eval ${value[$i]})>$tmp
-	status="$?"
-	output=`cat $tmp`
 
-	echo -e "$hostname\t${service[$i]}\t$status\t$output" | $SEND_NRDP -u $URL -t $TOKEN
-	
+		(eval "$command_prefix ${value[$i]}")>$tmp
+		status="$?"
+		output=`cat $tmp`
+	if [ "${service[$i]}" == "__HOST__" ];then
+		senddata="$senddata$hostname\t$status\t$output\n"
+	else
+		senddata="$senddata$hostname\t${service[$i]}\t$status\t$output\n"
+	fi
 done
-rm -f $tmp
-
+echo -e $senddata | $SEND_NRDP -u $URL -t $TOKEN
