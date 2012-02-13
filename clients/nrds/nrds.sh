@@ -7,7 +7,7 @@
 
 # Setup Defaults
 CONFIG=./nrds.cfg
-command_prefix=""
+COMMAND_PREFIX=""
 
 PROGNAME=$(basename $0)
 RELEASE="Revision 0.1"
@@ -35,15 +35,6 @@ print_help() {
 		exit 0
 }
 
-in_array() {
-    local hay=$2 needle=$1
-    shift
-    for hay; do
-        [[ $hay == $needle ]] && return 0
-    done
-    return 1
-}
-
 while getopts "c:H:hv" option
 do
   case $option in
@@ -63,9 +54,8 @@ if [ ! -f $CONFIG ];then
 	exit 1
 fi
 
-
 # Process the config
-valid_fields=(URL TOKEN TMPDIR SEND_NRDP command_prefix CONFIG_NAME CONFIG_VERSION)
+valid_fields=(URL TOKEN TMPDIR SEND_NRDP COMMAND_PREFIX CONFIG_NAME CONFIG_VERSION CONFIG_NAME UPDATE_CONFIG UPDATE_PLUGINS)
 i=0
 while read line; do
 if [[ "$line" =~ ^[^\#\;]*= ]]; then
@@ -92,11 +82,10 @@ if [ ! -f $SEND_NRDP ];then
 	exit 1
 fi
 
-senddata=""
 for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
 do
 		set +e
-		output=$(eval "$command_prefix ${value[$i]}")
+		output=$(eval "$COMMAND_PREFIX ${value[$i]}")
 		status="$?"
 		set -e
 	if [ "${service[$i]}" == "__HOST__" ];then
@@ -105,5 +94,5 @@ do
 		senddata="$senddata$hostname\t${service[$i]}\t$status\t$output\n"
 	fi
 done
-echo -e $senddata
+#echo -e $senddata
 echo -e $senddata | $SEND_NRDP -u $URL -t $TOKEN

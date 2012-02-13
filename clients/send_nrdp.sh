@@ -85,25 +85,27 @@ send_data() {
 	pdata="token=$token&cmd=submitcheck&XMLDATA=$1"
 	if [ $curl ];then
 		rslt=`curl --write-out %{http_code} --silent --output /dev/null -d "$pdata" $url`
+		ret=$?
 		#rslt=`curl -d "$pdata" $url`
 		#echo $rslt
 		if [ $rslt != 200 ];then
 			# This means we couldn't connect to NRPD server
-			# verify we are not processing the directory already and the directory
+			# verify we are not processing the directory already and then write to the directory
 			if [ ! "$2" ] && [ $directory ];then
 				# This is where we write to the tmp directory
 				echo $xml > `mktemp $directory/nrdp.XXXXXX`
 			fi
 			exit $rslt
 		fi
-		ret=$?
 	else
 		rslt=`wget -S -qO /dev/null --post-data="$pdata" $url`
 		ret=$?
 	fi
+	# If this was a directory call and was successful, remove the file
 	if [ "$2" ] && [ $ret == 0 ];then
 		rm -f "$2"
 	fi
+	# If we weren't successful error
 	if [ $ret != 0 ];then
 		echo "exited with error "$ret
 		exit $ret
