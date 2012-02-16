@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
@@ -21,7 +21,6 @@ print_usage() {
     echo "Usage: $PROGNAME -h"
     echo ""
 }
-
 print_help() {
 		print_usage
         echo ""
@@ -72,16 +71,36 @@ send_data() {
 					full_plugin_path=(${value[$i]})
 					plugin_name=`basename $full_plugin_path`
 					(`curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`)
+					# add permission changes here ?
+					chown nagios.nagios ${full_plugin_path}
+					chmod +x ${full_plugin_path}
 				done
 			fi
 		fi
 	else
-		rslt=`wget -S -qO /dev/null --post-data="$pdata" $URL`
+		rslt=`wget -q -O - --post-data="$pdata" $URL`
+		#echo $rslt
 		ret=$?
-	fi
-	# If this was a directory call and was successful, remove the file
-	if [ "$2" ] && [ $ret == 0 ];then
-		rm -f "$2"
+		status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
+		# rslt=`wget -qO /dev/null --post-data="$pdata" $URL`
+		if [ $ret == 0 ] && [ $status == 1 ];then
+			save_config=`wget -qO $CONFIG --post-data="token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" $URL`
+			process_config
+			# check if we need to update plugins
+			if [ "$UPDATE_PLUGINS" == "1" ];then
+				#this is where the plugin updates go
+				for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
+				do
+					full_plugin_path=(${value[$i]})
+					plugin_name=`basename $full_plugin_path`
+					`wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+					# add permission changes here ?
+					chown nagios.nagios ${full_plugin_path}
+					chmod +x ${full_plugin_path}
+				done
+			fi
+		fi
+		
 	fi
 	# If we weren't successful error
 	if [ $ret != 0 ];then

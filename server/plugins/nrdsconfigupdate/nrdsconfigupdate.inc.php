@@ -147,8 +147,8 @@ function nrds_config_update_check(){
 	output_api_header();
 	
 	echo "<result>\n";
-	echo "  <status>$status</status>\n";
-	echo "  <message>$message</message>\n";
+	echo "  <status>".$status."</status>\n";
+	echo "  <message>".$message."</message>\n";
 	echo "    <meta>\n";
 	echo "       <output>".$output."</output>\n";
 	echo "    </meta>\n";

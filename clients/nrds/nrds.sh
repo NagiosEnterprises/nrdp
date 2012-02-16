@@ -22,7 +22,7 @@ print_usage() {
 	echo ""
 	echo "Usage: nrds.sh -H hostname [-c /path/to/nrds.cfg]"
 	echo ""
-    echo "Usage: $PROGNAME -h"
+    echo "Usage: $PROGNAME -h display help"
     echo ""
 }
 

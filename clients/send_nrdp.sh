@@ -17,7 +17,7 @@ print_usage() {
 	echo ""
 	echo "Usage: send_nrdp.sh -u URL -t token [options]"
 	echo ""
-    echo "Usage: $PROGNAME -h"
+    echo "Usage: $PROGNAME -h display help"
     echo ""
 }
 
