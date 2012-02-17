@@ -60,26 +60,43 @@ send_data() {
 		rslt=`curl --silent -d "$pdata" $URL`
 		ret=$?
 		status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
-		if [ $ret == 0 ] && [ $status == 1 ];then
+		message=`echo $rslt | sed -n 's|.*<message>\(.*\)</message>.*|\1|p'`
+		if [ ! $status ];then
+		echo "ERROR: Could not connect to $URL check your cfg file."
+		fi
+		if [ "$status" == "-1" ];then
+			echo "ERROR: NRDP Server said - $message"
+		fi
+		if [ "$ret" == "0" ] && [ "$status" == "1" ];then
 			save_config=`curl -o $CONFIG --silent -d "token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" $URL`
 			process_config
 			# check if we need to update plugins
 			if [ "$UPDATE_PLUGINS" == "1" ];then
-				#this is where the plugin updates go
 				for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
 				do
 					full_plugin_path=(${value[$i]})
 					plugin_name=`basename $full_plugin_path`
-					(`curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`)
-					# add permission changes here ?
-					chown nagios.nagios ${full_plugin_path}
-					chmod +x ${full_plugin_path}
+					# this if makes sure we aren't downloading the same plugin twice
+					if [[ ! "${unique_plugins[@]}" =~ "${plugin_name}" ]];then
+						#make dir if it doesn't exist
+						DIRNAME=`dirname $full_plugin_path`
+						if [ ! -d "$DIRNAME" ];then
+							mkdir -p "$DIRNAME"
+							chown nagios.nagios "$DIRNAME"
+						fi
+						(`curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`)
+						# add permission changes here ?
+						chmod +x "${full_plugin_path}"
+						if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
+							chmod u+s "${full_plugin_path}"
+						fi
+						unique_plugins+=("${plugin_name}")
+					fi
 				done
 			fi
 		fi
 	else
 		rslt=`wget -q -O - --post-data="$pdata" $URL`
-		#echo $rslt
 		ret=$?
 		status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
 		# rslt=`wget -qO /dev/null --post-data="$pdata" $URL`
@@ -93,10 +110,19 @@ send_data() {
 				do
 					full_plugin_path=(${value[$i]})
 					plugin_name=`basename $full_plugin_path`
-					`wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
-					# add permission changes here ?
-					chown nagios.nagios ${full_plugin_path}
-					chmod +x ${full_plugin_path}
+					# this if makes sure we aren't downloading the same plugin twice
+					if [[ ! "${unique_plugins[@]}" =~ "${plugin_name}" ]];then
+						#make dir if it doesn't exist
+						DIRNAME=`dirname $full_plugin_path`
+						mkdir -p "$DIRNAME"
+						`wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+						# add permission changes here ?
+						chmod +x "${full_plugin_path}"
+						if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
+							chmod u+s "${full_plugin_path}"
+						fi
+						unique_plugins+=("${plugin_name}")
+					fi
 				done
 			fi
 		fi
@@ -140,7 +166,10 @@ then
 fi
 
 process_config
-
+if [[ "${URL}" =~ "localhost" ]];then
+	echo "ERROR: This should not be run on the localhost"
+exit 1
+fi
 if [ "$UPDATE_CONFIG" == "1" ] && [ ! "x$CONFIG_NAME" == "x" ] && [ ! "x$CONFIG_VERSION" == "x" ];then
 	xml="<?xml version='1.0' ?><configs><config><name>$CONFIG_NAME</name><version>$CONFIG_VERSION</version></config></configs>"
 	send_data "token=$TOKEN&cmd=updatenrds&XMLDATA=$xml"

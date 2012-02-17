@@ -5,9 +5,9 @@ from xml.dom.minidom  import parseString
 class send_nrdp:
     options = [
         optparse.make_option('-u', '--url', action="store",
-            dest="url", help="The URL used to access the remote NRDP agent."),
+            dest="url", help="** REQUIRED ** The URL used to access the remote NRDP agent."),
         optparse.make_option('-t', '--token', action="store",
-            dest="token", help="The secret token used to access the remote NRDP agent."),
+            dest="token", help="** REQUIRED ** The authentication token used to access the remote NRDP agent."),
         optparse.make_option('-H', '--hostname', action="store",
             dest="hostname", help="The name of the host associated with the passive host/service check result."),
         optparse.make_option('-s', '--service', action="store",
@@ -17,11 +17,9 @@ class send_nrdp:
         optparse.make_option('-o', '--output', action="store",
             dest="output", help="Text output to be sent as the passive check result.  Newlines should be encoded with encoded newlines (\\n)."),
         optparse.make_option('-d', '--delim', action="store",
-            dest="delim", help="Delimiter default id \\t (tab)."),
+            dest="delim", help="With only the required parameters send_nrdp.py is capable of processing data piped to it either from a file or other process.  By default, we use t as the delimiter however this may be specified with the -d option data should be in the following formats one entry per line."),
         optparse.make_option('-c', '--checktype', action="store",
-            dest="checktype", help="1 for passive 0 for active"),
-        optparse.make_option('-U', '--usestdin', action="store_true",
-            dest="usestdin", help="usestdin")
+            dest="checktype", help="1 for passive 0 for active")
     ]
 
     def run(self):
@@ -52,6 +50,7 @@ class send_nrdp:
             result = parseString(f.read())
         except Exception, e:
             print "Cannot connect to url."
+			# TODO add directory option
             sys.exit(e)
         if self.getText(result.getElementsByTagName("status")[0].childNodes) == "0":
             sys.exit()
@@ -66,7 +65,8 @@ class send_nrdp:
             options.checktype = "1"
         xml="<?xml version='1.0'?>\n<checkresults>\n";
         
-        if options.usestdin:
+		# it is possible this may not work on windows systems...
+        if not sys.stdin.isatty():
             for line in sys.stdin.readlines():
                 parts = line.split(options.delim)
                 if len(parts) == 4:
@@ -83,6 +83,9 @@ class send_nrdp:
                     xml += "<output>"+cgi.escape(parts[2],True)+"</output>"
                     xml += "</checkresult>"
                     
+        # TODO add file option
+		#elif options.file:
+		#	xml += READ THE FILE
         else:        
             if options.hostname and options.state:
                 if options.service:
@@ -98,8 +101,8 @@ class send_nrdp:
                     xml += "<state>"+options.state+"</state>"
                     xml += "<output>"+cgi.escape(options.output,True)+"</output>"
                     xml += "</checkresult>"
-        xml += "</checkresults>"
-        self.post_data(options.url, options.token, xml)
+                xml += "</checkresults>"
+                self.post_data(options.url, options.token, xml)
 if __name__ == "__main__":
     send_nrdp().run()     
 

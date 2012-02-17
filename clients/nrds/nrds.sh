@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
@@ -6,7 +6,7 @@
 ###########################
 
 # Setup Defaults
-CONFIG=./nrds.cfg
+CONFIG=/usr/local/nrdp/clients/nrds/nrds.cfg
 COMMAND_PREFIX=""
 
 PROGNAME=$(basename $0)
@@ -84,10 +84,8 @@ fi
 
 for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
 do
-		set +e
 		output=$(eval "$COMMAND_PREFIX ${value[$i]}")
 		status="$?"
-		set -e
 	if [ "${service[$i]}" == "__HOST__" ];then
 		senddata="$senddata$hostname\t$status\t$output\n"
 	else

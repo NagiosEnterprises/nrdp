@@ -38,7 +38,7 @@ print_help() {
 		echo "		-o 	output"
 		echo ""
 		echo "	STDIN:"
-		echo "		-d	delimiter (default \"\\t\")"
+		echo "		[-d	delimiter] (default -d \"\\t\")"
 		echo "		With only the required parameters $PROGNAME is capable of"
 		echo "		processing data piped to it either from a file or other"
 		echo "		process.  By default, we use \t as the delimiter however this"

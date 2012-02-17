@@ -1,0 +1,11 @@
+#!/bin/bash -e
+#
+# Copyright (c) 2010-2011 Nagios Enterprises, LLC.
+# 
+# NRDS Client Install Script
+###########################
+
+cp -r * /usr/local/nrdp/client
+chown -R nagios.nagios /usr/local/nrdp/client
+chmod -R ug+xw /usr/local/nrdp/client/
+chmod -R ug-x /usr/local/nrdp/client/*.cfg
