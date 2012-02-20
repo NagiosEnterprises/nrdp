@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
@@ -90,11 +90,13 @@ send_data() {
 		#echo $rslt
 		if [ $rslt != 200 ];then
 			# This means we couldn't connect to NRPD server
+			echo "ERROR: could not connect to NRDP server at $url"
 			# verify we are not processing the directory already and then write to the directory
 			if [ ! "$2" ] && [ $directory ];then
 				# This is where we write to the tmp directory
 				echo $xml > `mktemp $directory/nrdp.XXXXXX`
 			fi
+			
 			exit $rslt
 		fi
 	else
