@@ -6,7 +6,7 @@
 ###########################
 
 PROGNAME=$(basename $0)
-RELEASE="Revision 0.1"
+RELEASE="Revision 0.2"
 
 print_release() {
     echo "$RELEASE"
@@ -84,27 +84,38 @@ print_help() {
 send_data() {
 	pdata="token=$token&cmd=submitcheck&XMLDATA=$1"
 	if [ $curl ];then
-		rslt=`curl --write-out %{http_code} --silent --output /dev/null -d "$pdata" $url`
+		rslt=`curl -f --silent -d "$pdata" "$url/"`
 		ret=$?
-		#rslt=`curl -d "$pdata" $url`
-		#echo $rslt
-		if [ $rslt != 200 ];then
-			# This means we couldn't connect to NRPD server
-			echo "ERROR: could not connect to NRDP server at $url"
-			# verify we are not processing the directory already and then write to the directory
-			if [ ! "$2" ] && [ $directory ];then
-				# This is where we write to the tmp directory
-				echo $xml > `mktemp $directory/nrdp.XXXXXX`
-			fi
-			
-			exit $rslt
-		fi
 	else
-		rslt=`wget -S -qO /dev/null --post-data="$pdata" $url`
+		rslt=`wget -q -O - --post-data="$pdata" "$url/"`
 		ret=$?
 	fi
+	status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
+	message=`echo $rslt | sed -n 's|.*<message>\(.*\)</message>.*|\1|p'`
+	if [ $ret != 0 ];then
+		echo "ERROR: could not connect to NRDP server at $url"
+		# verify we are not processing the directory already and then write to the directory
+		if [ ! "$2" ] && [ $directory ];then
+			# This is where we write to the tmp directory
+			echo $xml > `mktemp $directory/nrdp.XXXXXX`
+		fi
+		exit 1
+	fi
+	
+	if [ "$status" != "0" ];then
+		# This means we couldn't connect to NRPD server
+		echo "ERROR: The NRDP Server said $message"
+		# verify we are not processing the directory already and then write to the directory
+		if [ ! "$2" ] && [ $directory ];then
+			# This is where we write to the tmp directory
+			echo $xml > `mktemp $directory/nrdp.XXXXXX`
+		fi
+		
+		exit 2
+	fi
+	
 	# If this was a directory call and was successful, remove the file
-	if [ "$2" ] && [ $ret == 0 ];then
+	if [ $2 ] && [ "$status" == "0" ];then
 		rm -f "$2"
 	fi
 	# If we weren't successful error
@@ -165,11 +176,11 @@ fi
 if [ $host ]; then
 	xml=""
 	# we are not getting piped results
-	if [ ! $host ] || [ ! $State ]; then
+	if [ "$host" == "" ] || [ "$State" == "" ]; then
 		echo "You must provide a host -H and State -S"
 		exit 2
 	fi
-	if [ $service ]; then
+	if [ "$service" != "" ]; then
 		xml=$xml"<checkresult type='service' checktype='"$checktype"'>"
 		xml=$xml"<servicename>"$service"</servicename>"
 	else
