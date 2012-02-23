@@ -92,5 +92,8 @@ do
 		senddata="$senddata$hostname\t${service[$i]}\t$status\t$output\n"
 	fi
 done
-#echo -e $senddata
-echo -e $senddata | $SEND_NRDP -u $URL -t $TOKEN
+if [ $TMPDIR ];then
+	mytmpdir="-d $TMPDIR"
+fi
+echo -e $senddata | $SEND_NRDP -u "$URL" -t "$TOKEN"
+

@@ -58,75 +58,61 @@ send_data() {
 	pdata=$1
 	if [ $curl ];then
 		rslt=`curl --silent -d "$pdata" $URL`
-		ret=$?
-		status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
-		message=`echo $rslt | sed -n 's|.*<message>\(.*\)</message>.*|\1|p'`
-		if [ ! $status ];then
-		echo "ERROR: Could not connect to $URL check your cfg file."
-		fi
-		if [ "$status" == "-1" ];then
-			echo "ERROR: NRDP Server said - $message"
-		fi
-		if [ "$ret" == "0" ] && [ "$status" == "1" ];then
-			save_config=`curl -o $CONFIG --silent -d "token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" $URL`
-			process_config
-			# check if we need to update plugins
-			if [ "$UPDATE_PLUGINS" == "1" ];then
-				for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
-				do
-					full_plugin_path=(${value[$i]})
-					plugin_name=`basename $full_plugin_path`
-					# this if makes sure we aren't downloading the same plugin twice
-					if [[ ! "${unique_plugins[@]}" =~ "${plugin_name}" ]];then
-						#make dir if it doesn't exist
-						DIRNAME=`dirname $full_plugin_path`
-						if [ ! -d "$DIRNAME" ];then
-							mkdir -p "$DIRNAME"
-							chown nagios.nagios "$DIRNAME"
-						fi
-						(`curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`)
-						# add permission changes here ?
-						chmod +x "${full_plugin_path}"
-						if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
-							chmod u+s "${full_plugin_path}"
-						fi
-						unique_plugins+=("${plugin_name}")
-					fi
-				done
-			fi
-		fi
 	else
 		rslt=`wget -q -O - --post-data="$pdata" $URL`
-		ret=$?
-		status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
-		# rslt=`wget -qO /dev/null --post-data="$pdata" $URL`
-		if [ $ret == 0 ] && [ $status == 1 ];then
+	fi
+	ret=$?
+	status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
+	message=`echo $rslt | sed -n 's|.*<message>\(.*\)</message>.*|\1|p'`
+	if [[ $rslt =~ "NO REQUEST HANDLER" ]];then
+		echo "ERROR $rslt. Check the server config and version" 
+		exit 1
+	fi
+	if [ ! $status ];then
+		echo "ERROR: Could not connect to $URL check your cfg file."
+		exit 1
+	fi
+	if [ "$status" == "-1" ];then
+		echo "ERROR: NRDP Server said - $message"
+		exit 1
+	fi
+	if [ "$status" == "1" ];then
+		if [ $curl ];then
+			save_config=`curl -o $CONFIG --silent -d "token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" $URL`
+		else
 			save_config=`wget -qO $CONFIG --post-data="token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" $URL`
-			process_config
-			# check if we need to update plugins
-			if [ "$UPDATE_PLUGINS" == "1" ];then
-				#this is where the plugin updates go
-				for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
-				do
-					full_plugin_path=(${value[$i]})
-					plugin_name=`basename $full_plugin_path`
-					# this if makes sure we aren't downloading the same plugin twice
-					if [[ ! "${unique_plugins[@]}" =~ "${plugin_name}" ]];then
-						#make dir if it doesn't exist
-						DIRNAME=`dirname $full_plugin_path`
-						mkdir -p "$DIRNAME"
-						`wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
-						# add permission changes here ?
-						chmod +x "${full_plugin_path}"
-						if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
-							chmod u+s "${full_plugin_path}"
-						fi
-						unique_plugins+=("${plugin_name}")
-					fi
-				done
-			fi
 		fi
-		
+		process_config
+		echo "Updated config to version $CONFIG_VERSION"
+		# check if we need to update plugins
+		if [ "$UPDATE_PLUGINS" == "1" ];then
+			for (( i=0; i<=$(( ${#service[*]} -1 )); i++ ))
+			do
+				full_plugin_path=(${value[$i]})
+				plugin_name=`basename $full_plugin_path`
+				# this if makes sure we aren't downloading the same plugin twice
+				if [[ ! "${unique_plugins[@]}" =~ "${plugin_name}" ]];then
+					#make dir if it doesn't exist
+					DIRNAME=`dirname $full_plugin_path`
+					if [ ! -d "$DIRNAME" ];then
+						mkdir -p "$DIRNAME"
+						chown nagios.nagios "$DIRNAME"
+					fi
+					if [ $curl ];then
+						`curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+					else
+						`wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+					fi
+					# add permission changes here ?
+					chmod +x "${full_plugin_path}"
+					if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
+						chmod u+s "${full_plugin_path}"
+					fi
+					unique_plugins+=("${plugin_name}")
+				fi
+			done
+			echo "Updated ${#unique_plugins[*]} plugins"
+		fi
 	fi
 	# If we weren't successful error
 	if [ $ret != 0 ];then

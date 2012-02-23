@@ -6,7 +6,7 @@
 ###########################
 
 PROGNAME=$(basename $0)
-RELEASE="Revision 0.2"
+RELEASE="Revision 0.3"
 
 print_release() {
     echo "$RELEASE"
@@ -96,6 +96,9 @@ send_data() {
 		echo "ERROR: could not connect to NRDP server at $url"
 		# verify we are not processing the directory already and then write to the directory
 		if [ ! "$2" ] && [ $directory ];then
+			if [ ! -d "$directory" ];then
+				mkdir -p "$directory"
+			fi
 			# This is where we write to the tmp directory
 			echo $xml > `mktemp $directory/nrdp.XXXXXX`
 		fi
@@ -107,6 +110,9 @@ send_data() {
 		echo "ERROR: The NRDP Server said $message"
 		# verify we are not processing the directory already and then write to the directory
 		if [ ! "$2" ] && [ $directory ];then
+			if [ ! -d "$directory" ];then
+				mkdir -p "$directory"
+			fi
 			# This is where we write to the tmp directory
 			echo $xml > `mktemp $directory/nrdp.XXXXXX`
 		fi
@@ -172,7 +178,7 @@ then
   echo "Either curl or wget are required to run this script"
   exit 1
 fi
-
+checkcount=0
 if [ $host ]; then
 	xml=""
 	# we are not getting piped results
@@ -190,6 +196,7 @@ if [ $host ]; then
 	xml=$xml"<state>"$State"</state>"
 	xml=$xml"<output>"$output"</output>"
 	xml=$xml"</checkresult>"
+	checkcount=1
 fi
 # Detect STDIN
 ########################
@@ -197,6 +204,7 @@ if [ ! -t 0 ]; then
 	xml=""
     # we know we are being piped results
 	IFS=$delim
+	
 	while read -r line ; do
 		arr=($line)
 		if [ ${#arr[@]} != 0 ];then
@@ -217,6 +225,7 @@ if [ ! -t 0 ]; then
 				fi
 				
 				xml=$xml"</checkresult>"
+				checkcount=$[checkcount+1]
 			fi
 		fi
     done
@@ -225,6 +234,7 @@ fi
 if [ $host ] || [ ! -t 0 ] ;then
 	xml="<?xml version='1.0'?><checkresults>"$xml"</checkresults>"
 	send_data "$xml"
+	echo "Sent $checkcount checks to $url"
 fi
 if [ $file ];then
 	xml=`cat $file`
