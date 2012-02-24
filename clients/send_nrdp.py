@@ -50,7 +50,7 @@ class send_nrdp:
             result = parseString(f.read())
         except Exception, e:
             print "Cannot connect to url."
-			# TODO add directory option
+            # TODO add directory option
             sys.exit(e)
         if self.getText(result.getElementsByTagName("status")[0].childNodes) == "0":
             sys.exit()
@@ -65,7 +65,7 @@ class send_nrdp:
             options.checktype = "1"
         xml="<?xml version='1.0'?>\n<checkresults>\n";
         
-		# it is possible this may not work on windows systems...
+        # it is possible this may not work on windows systems...
         if not sys.stdin.isatty():
             for line in sys.stdin.readlines():
                 parts = line.split(options.delim)
@@ -84,8 +84,8 @@ class send_nrdp:
                     xml += "</checkresult>"
                     
         # TODO add file option
-		#elif options.file:
-		#	xml += READ THE FILE
+        #elif options.file:
+        #    xml += READ THE FILE
         else:        
             if options.hostname and options.state:
                 if options.service:
