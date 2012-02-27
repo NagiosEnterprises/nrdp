@@ -47,7 +47,7 @@ $cfg["tmp_dir"]="/usr/local/nagios/var/tmp";
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 
 $cfg['product_name']='nrdp';
-$cfg['product_version']='1.0'
+$cfg['product_version']='1.2'
 
 
 ?>

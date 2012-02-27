@@ -43,7 +43,7 @@ eval "$usermodbin" -a -G "$nagiosgroup" "$nagiosuser"
 echo "Installing NRDS Client"
 echo ""
 mkdir -p "$installdir"
-cp -r * "$installdir"
+cp -fr * "$installdir"
 chown -R nagios:nagios "$installdir"
 chmod -R ug+xw "$installdir"
 
