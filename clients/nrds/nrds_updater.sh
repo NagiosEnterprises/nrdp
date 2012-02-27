@@ -7,7 +7,8 @@
 
 PROGNAME=$(basename $0)
 RELEASE="Revision 0.1"
-
+# defaults
+CONFIG=/usr/local/nrdp/clients/nrds/nrds.cfg
 # Functions plugin usage
 print_release() {
     echo "$RELEASE"
@@ -110,6 +111,7 @@ send_data() {
             else
                 save_config=`wget -qO $CONFIG --post-data="token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" "$URL"`
             fi
+            
             process_config
             echo "Updated config to version $CONFIG_VERSION"
             # check if we need to update plugins
@@ -125,11 +127,12 @@ send_data() {
     fi
 }
 
-while getopts "c:hv" option
+while getopts "c:hvf" option
 do
     case "$option" in
         c) CONFIG="$OPTARG" ;;
         h) print_help 0;;
+        f) force="1" ;;
         v) print_release
             exit 0 ;;
     esac
@@ -161,6 +164,9 @@ process_config
 if [[ "${URL}" =~ "localhost" ]];then
     echo "ERROR: This should not be run on the localhost"
     exit 1
+fi
+if [ "$force" == "1" ];then
+    CONFIG_VERSION="0"
 fi
 if [ "$UPDATE_CONFIG" == "1" ] && [ ! "x$CONFIG_NAME" == "x" ] && [ ! "x$CONFIG_VERSION" == "x" ];then
     xml="<?xml version='1.0' ?><configs><config><name>$CONFIG_NAME</name><version>$CONFIG_VERSION</version></config></configs>"

@@ -9,6 +9,8 @@
 require_once(dirname(__FILE__).'/../../config.inc.php');
 require_once(dirname(__FILE__).'/../../includes/utils.inc.php');
 
+global $cfg;
+$cfg["config_dir"]="/usr/local/nrdp/configs";
 
 register_callback(CALLBACK_PROCESS_REQUEST,'nrdsconfigupdate_process_request');
 
@@ -29,21 +31,50 @@ function nrdsconfigupdate_process_request($cbtype,$args){
         case "getplugin":
             nrds_get_plugin();
             break;
+        case "nrdsgetclient":
+            nrds_get_client_install();
+            break;
+           
         // something else we don't handle...
         default:
             break;
         }
     }
 
+function nrds_get_client_install(){
+    global $cfg;
+    global $request;
+    $configname=grab_request_var("configname");
+   
+    $config_file=$cfg["config_dir"]."/".$configname.".cfg";
+    $nrds_config_tmp_dir=$cfg["tmp_dir"]."/nrdsconfig";
+    $client_install_file="$nrds_config_tmp_dir/$configname.tar.gz";
+    $script = "mkdir -p $nrds_config_tmp_dir;cp -fr /usr/local/nrdp/clients $nrds_config_tmp_dir;chmod +x $nrds_config_tmp_dir/clients/installnrds;cp -f $config_file $nrds_config_tmp_dir/clients/nrds/nrds.cfg;cd $nrds_config_tmp_dir; tar czfp $nrds_config_tmp_dir/$configname.tar.gz clients;rm -rf $nrds_config_tmp_dir/clients;";
+    $rslt = system($script,$retval);
+    if (file_exists($client_install_file)) {
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=\"$configname.tar.gz\"");
+        header("Content-Length: ".filesize($client_install_file));
+        passthru("cat $client_install_file",$err);
+        unlink($client_install_file);
+        rmdir($nrds_config_tmp_dir);
+        exit();
+    } else {
+        header("HTTP/1.0 404 Not Found");
+        exit;
+    }
+}
+
+
 //this function grabs the config for delivery
 function nrds_get_config(){
     global $cfg;
     global $request;
-    $cfg["config_dir"]="/usr/local/nrdp/configs";
     $configname=grab_request_var("configname");
     $config=$cfg["config_dir"]."/".$configname.".cfg";
     if (file_exists($config)) {
-        readfile($config);
+        //readfile($config);
+        passthru("cat $config",$err);
         exit;
     } else {
         header("HTTP/1.0 404 Not Found");
@@ -53,7 +84,6 @@ function nrds_get_config(){
 function nrds_get_plugin(){
     global $cfg;
     global $request;
-    $cfg["plugin_dir"]="/usr/local/nagios/libexec";
     $plugin_var=grab_request_var("plugin");
     $plugin=$cfg["plugin_dir"]."/".$plugin_var;
     if (file_exists($plugin)) {
@@ -71,7 +101,6 @@ function nrds_get_plugin(){
 function nrds_config_update_check(){
     global $cfg;
     global $request;
-    $cfg["config_dir"]="/usr/local/nrdp/configs";
     
     $debug=false;
     

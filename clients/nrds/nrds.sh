@@ -7,6 +7,7 @@
 
 # Setup Defaults
 CONFIG=/usr/local/nrdp/clients/nrds/nrds.cfg
+SEND_NRDP=/usr/local/nrdp/clients/send_nrdp.sh
 COMMAND_PREFIX=""
 
 PROGNAME=$(basename $0)
@@ -34,7 +35,32 @@ print_help() {
     echo ""
     exit 0
 }
-
+process_config(){
+    name=""
+    service=""
+    value=""
+    # Process the config
+    valid_fields=(URL TOKEN TMPDIR SEND_NRDP COMMAND_PREFIX CONFIG_NAME CONFIG_VERSION CONFIG_NAME UPDATE_CONFIG UPDATE_PLUGINS PLUGIN_DIR)
+    while read line; do
+        if [[ ! "$line" =~ ^[^\#\;]*= ]]; then
+            continue
+        fi
+        #grab all the commands and put in arrays
+        if [ ${line:0:7} == "command" ];then
+            name[i]=`echo $line | cut -d'=' -f 1`
+            service[i]=${name[i]:8:(${#name[i]}-8-1)}
+            value[i]=`echo $line | cut -d'=' -f 2-`
+            ((i++))
+        # not a command lets process the rest of the config
+        # first make sure it is part of valid_fields
+        elif [[ "${valid_fields[@]}" =~ `echo $line | cut -d'=' -f 1` ]];then
+            eval $line
+        else	
+            echo "ERROR: `echo $line | cut -d'=' -f 1` is not a valid cfg field."
+            exit 1
+        fi
+    done < "$CONFIG"
+}
 while getopts "c:H:hv" option
 do
     case $option in
@@ -53,32 +79,12 @@ if [ ! -f "$CONFIG" ];then
     echo "Could not find config file at "$CONFIG
     exit 1
 fi
-
-# Process the config
-valid_fields=(URL TOKEN TMPDIR SEND_NRDP COMMAND_PREFIX CONFIG_NAME CONFIG_VERSION CONFIG_NAME UPDATE_CONFIG UPDATE_PLUGINS PLUGIN_DIR)
-while read line; do
-    if [[ ! "$line" =~ ^[^\#\;]+= ]]; then
-        continue
-    fi
-    #grab all the commands
-    if [ ${line:0:7} == "command" ];then
-        name[i]=`echo $line | cut -d'=' -f 1`
-        service[i]=${name[i]:8:(${#name[i]}-8-1)}
-        value[i]=`echo $line | cut -d'=' -f 2-`
-        ((i++))
-    # not a command lets process the rest of the config
-    # first make sure it is part of valid_fields
-    elif [[ "${valid_fields[@]}" =~ `echo $line | cut -d'=' -f 1` ]];then
-        eval $line
-    else	
-        echo "ERROR: `echo $line | cut -d'=' -f 1` is not a valid cfg field."
-        exit 1
-    fi
-done < "$CONFIG"
 if [ ! -f "$SEND_NRDP" ];then
     echo "Could not find SEND_NRDP file at $SEND_NRDP"
     exit 1
 fi
+
+process_config
 
 for (( i=0; i < ${#service[*]}; i++ ))
 do
@@ -93,5 +99,8 @@ done
 if [ "$TMPDIR" ];then
     mytmpdir="-d $TMPDIR"
 fi
-echo -e "$senddata" | $SEND_NRDP -u "$URL" -t "$TOKEN"
-
+echo -e "$senddata" | $SEND_NRDP -u "$URL" -t "$TOKEN" -d "$mytmpdir"
+if [ "$UPDATE_CONFIG" == "1" ] && [ ! "x$CONFIG_NAME" == "x" ] && [ ! "x$CONFIG_VERSION" == "x" ];then
+    DIR=$(cd $(dirname "$0"); pwd)
+   "$DIR"/nrds_updater.sh
+fi

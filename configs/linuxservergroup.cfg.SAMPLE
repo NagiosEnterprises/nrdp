@@ -117,7 +117,7 @@ command[Check Total Procs]=/usr/local/nagios/libexec/check_procs -w 150 -c 200
 # TMPDIR
 # This is where any needed temporary files will be created.
 
-TMPDIR="/usr/local/nrdp/clients/tmp"
+TMPDIR=/usr/local/nrdp/clients/tmp
 
 #############################################################################
 # END NRDS CONFIG
