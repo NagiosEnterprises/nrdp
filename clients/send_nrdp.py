@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# Copyright (c) 2010-2011 Nagios Enterprises, LLC.
+# Copyright (c) 2010-2012 Nagios Enterprises, LLC.
+# Written by: Scott Wilkerson (nagios@nagios.org)
 import optparse, sys, urllib, cgi
 from xml.dom.minidom  import parseString
 class send_nrdp:

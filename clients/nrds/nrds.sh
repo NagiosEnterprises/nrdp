@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Written by: Scott Wilkerson (nagios@nagios.org)
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
 #

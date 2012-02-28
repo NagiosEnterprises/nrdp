@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Written by: Scott Wilkerson (nagios@nagios.org)
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
 # NRDS Client Install Script
@@ -54,6 +55,6 @@ echo "$oldcron" >/var/spool/cron/$nagiosuser
 echo "*/$croninterval * * * * $installdir/nrds/nrds.sh -H $cronhost 2>&1" >> /var/spool/cron/$nagiosuser
 echo "Updating config and plugins"
 update="`$installdir/nrds/nrds_updater.sh -f`"
-ret=$?
+echo $update
 echo "Installation complete"
 exit $ret

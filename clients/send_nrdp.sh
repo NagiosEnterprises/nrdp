@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Copyright (c) 2010-2011 Nagios Enterprises, LLC.
-# 
+# Copyright (c) 2010-2012 Nagios Enterprises, LLC.
+# Written by: Scott Wilkerson (nagios@nagios.org)
 #
 ###########################
 

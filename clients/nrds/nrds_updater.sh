@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# Written by: Scott Wilkerson (nagios@nagios.org)
 # Copyright (c) 2010-2011 Nagios Enterprises, LLC.
 # 
 #
@@ -41,6 +41,7 @@ update_plugins() {
         fi
         #make dir if it doesn't exist
         DIRNAME=`dirname $full_plugin_path`
+
         if [ ! -d "$DIRNAME" ];then
             mkdir -p "$DIRNAME"
             chown nagios:nagios "$DIRNAME"
@@ -51,6 +52,7 @@ update_plugins() {
             `wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
         fi
         # add permission changes here ?
+        chown nagios:nagios "${full_plugin_path}"
         chmod +x "${full_plugin_path}"
         if [ "${plugin_name}" == "check_icmp" -o "${plugin_name}" == "check_dhcp" ];then
             chmod u+s "${full_plugin_path}"
@@ -111,7 +113,7 @@ send_data() {
             else
                 save_config=`wget -qO $CONFIG --post-data="token=$TOKEN&cmd=getconfig&configname=$CONFIG_NAME" "$URL"`
             fi
-            
+            chown nagios:nagios "$CONFIG"
             process_config
             echo "Updated config to version $CONFIG_VERSION"
             # check if we need to update plugins
