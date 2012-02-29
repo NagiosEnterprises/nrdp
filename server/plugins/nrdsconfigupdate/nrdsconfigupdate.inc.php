@@ -11,7 +11,7 @@ require_once(dirname(__FILE__).'/../../includes/utils.inc.php');
 
 global $cfg;
 $cfg["config_dir"]="/usr/local/nrdp/configs";
-$cfg["plugin_dir"]="/usr/local/nagios/libexec";
+$cfg["plugin_root"]="/usr/local/nrdp/plugins";
 
 register_callback(CALLBACK_PROCESS_REQUEST,'nrdsconfigupdate_process_request');
 
@@ -85,18 +85,44 @@ function nrds_get_config(){
 function nrds_get_plugin(){
     global $cfg;
     global $request;
-    $plugin_var=grab_request_var("plugin");
-    $plugin=$cfg["plugin_dir"]."/".$plugin_var;
-    if (file_exists($plugin)) {
-        header("Content-Type: application/octet-stream");
-        header("Content-Disposition: attachment; filename=\"$plugin_var\"");
-        header("Content-Length: ".filesize($plugin));
-        passthru("cat $plugin",$err);
-        exit();
-    } else {
-        header("HTTP/1.0 404 Not Found");
-        exit;
+    $plugin=grab_request_var("plugin");
+    $os=grab_request_var("os");
+    $arch=grab_request_var("arch");
+    $os_ver=grab_request_var("os_ver");
+    
+    /*
+        TODO
+        I think we need some logic to group OS's
+        Current folders are
+        AIX
+        Linux
+        OSX
+        Solaris
+        Windows
+        Generic
+    */
+    
+    //These are the potential plugin paths, they will be searched in order
+    $possible_plugin_paths = array(
+        "{$cfg['plugin_root']}/$os/$arch/$os_ver/$plugin",
+        "{$cfg['plugin_root']}/$os/$arch/$plugin",
+        "{$cfg['plugin_root']}/$os/$plugin",
+        "{$cfg['plugin_root']}/Generic/$arch/$plugin",
+        "{$cfg['plugin_root']}/Generic/$plugin"
+        );
+        
+    foreach($possible_plugin_paths as $possible_plugin_paths){
+        if (file_exists($possible_plugin_paths)) {
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=\"$plugin\"");
+            header("Content-Length: ".filesize($possible_plugin_paths));
+            passthru("cat $possible_plugin_paths",$err);
+            exit();
+        }
     }
+    header("HTTP/1.0 404 Not Found");
+    exit;
+
 
 }
 function nrds_config_update_check(){
