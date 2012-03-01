@@ -91,6 +91,10 @@ for (( i=0; i < ${#service[*]}; i++ ))
 do
     output=$(eval "$COMMAND_PREFIX ${value[$i]}")
     status="$?"
+    if [ "$status" -gt "3" ];then
+        output="Error code $status - check plugin"
+        status="3"
+    fi
     if [ "${service[$i]}" == "__HOST__" ];then
         senddata="$senddata$hostname\t$status\t$output\n"
     else
