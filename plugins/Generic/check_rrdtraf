@@ -1,0 +1,325 @@
+#!/bin/sh
+########################################################################
+########
+#
+# CHECK_RRDTRAF plugin for Nagios
+#
+# Written by Garry W. Cook <gwc@cookbros.net> 
+# and Israel Brewster <israel@frontierflying.com>
+#
+# Description:
+# This plugin will read the current value from an rrd file and compare with
+# warning and critical values, for inbound and outbound bandwidth parameters.
+# It will also optionally check the age of the rrd file and warn if
+# the file is older than a specified limit.
+#
+#  Notes:
+#   - This plugin requires:
+#       rrdtool
+#       awk
+#	sed
+#
+#
+# Example checkcommands.cfg entry:
+#
+# 'check_rrdtraf' command definition
+#define command{
+#       command_name    check_rrdtraf
+#       command_line    $USER1$/check_rrdtraf -f $ARG1$ -c $ARG2$ -w $ARG3$ [-e $ARG4$] [-l $ARG5$]
+#       }
+#
+#
+
+####################################################
+# Edit the following variables to match your system.
+####################################################
+# You may need to edit the path variable below to include the location
+# your rrdtool binary is installed in
+RRDTOOLPATH=`echo /usr/local/rrdtool*/bin | awk '{for(i=1;i<=NF;i++) printf(":%s",$i)}'`
+PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin$RRDTOOLPATH
+
+# Optional Config
+# Set the traffic calculation precision (# of decimals)
+SCALE=2
+####################################################
+# Nothing to change below this line (hopefully)
+####################################################
+OSTYPE=`uname -s`
+if [ $OSTYPE = "Linux" ]
+then
+    STATFLAGS='-c %Y'
+else
+    STATFLAGS='-f %m'
+fi
+
+PROGNAME=`basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION='0.5'
+
+
+. $PROGPATH/utils.sh
+
+print_usage() {
+        echo ""
+        echo "Usage:"
+        echo " $PROGNAME -f <rrd_file> -w <warning_pair> -c <critical_pair>"
+	echo "           [-v][-e expire_seconds] [-l label_units]"
+        echo " $PROGNAME (-V | --version)"
+        echo " $PROGNAME (-h | --help)"
+        echo " "
+	echo "Options:"
+	echo "-h, --help"
+	echo "	Print detaiiled help screen"
+	echo "-V, --version"
+	echo "	Print version information"
+	echo "-v	Verbose output. Can be specified twice for more verbosity"
+	echo "-vv	More verbose output, same as -v -v"
+	echo "-f	Full path to RRD file to read data from"
+	echo "-w	Warning threshold <rate> or pair <incoming>,<outgoing>"
+	echo "-c	Critical threshold <rate> or pair <incoming>,<outgoing>"
+	echo "-e	Log age threshold (in seconds, 5min=300)"
+	echo "-l	Data display label, one of B,K,M or G"
+	echo ""
+	echo "Notes:"
+        echo "-Warning and critical thresholds are MAX values,"
+        echo " going above the threshold will trigger an alert."
+        echo "-Labels and units for warning and critical values"
+        echo " are determined by the -l argument (if specified):"
+        echo " B=bps; K=Kbps; M=Mbps; G=Gbps"
+	echo "-If the -l switch is specified, input values are assumed to"
+	echo " be in the same units as specified in the -l switch"
+	echo "-If the -l switch is not specified, output values are scaled"
+	echo " appropriately, and input values are assumed to be in Kbps" 
+        echo ""
+}
+
+print_help() {
+        print_version
+        print_usage
+        echo "Nagios Plugin: Check Bandwidth within an RRD."
+        echo ""
+        support
+	echo "You may also contact the developer of this plug-in directly"
+	echo "at israel@frontierflying.com"
+}
+
+print_version() {
+	echo "$PROGNAME v$REVISION" 
+}
+
+set_label(){
+case $2 in
+    B | b)
+        LABEL=" "
+        DIV="1"
+        ;;
+    K | k)   
+        LABEL="K"
+        DIV="1000"
+        ;;
+    M | m)
+        LABEL="M"
+        DIV="1000000"
+        ;;
+    G | g)
+        LABEL="G"
+        DIV="1000000000"
+        ;;
+    *)   
+        echo "$2 not a valid Label/Multiplier"
+        exit $STATE_UNKNOWN
+        ;;
+esac
+}
+
+exitstatus=$STATE_UNKNOWN #default
+MAXAGE=0
+FILEAGE=0
+VERBOSITY=0
+LC_NUMERIC="en_US.UTF-8"
+
+# Check for --help, etc.
+case $1 in
+    -V|--version)
+        print_version
+        exit $STATE_UNKNOWN
+        ;;
+    -h|--help)
+        print_help
+        exit $STATE_UNKNOWN
+        ;;
+esac
+
+# Verify correct number of arguments
+if [ $# -lt 6 ]; then
+    print_usage
+    exit $STATE_UNKNOWN
+fi
+
+while [ $# -gt 0 ];do
+    case $1 in
+	-f)
+	    FILE=$2
+	    shift
+	    ;;
+	-c)
+	    CRITICAL=$2
+	    shift
+	    ;;
+	-w)
+	    WARNING=$2
+	    shift
+	    ;;
+	-e)
+	    MAXAGE=$2
+	    shift
+	    ;;
+	-l)
+	    set_label $1 $2
+	    shift
+	    ;;
+	-V|--version)
+        print_version
+        exit $STATE_UNKNOWN
+        ;; 
+	-v)
+	VERBOSITY=$(($VERBOSITY+1))
+	;;
+	-vv)
+	VERBOSITY=2
+	;;
+	*)
+	    echo "$1 is not a recognized option!"
+	    print_usage
+	    exit $STATE_UNKNOWN
+	    ;; 
+    esac
+    shift
+done
+
+if [ $VERBOSITY -gt 0 ]; then
+    echo "Using RRD file: $FILE"
+fi
+#######
+#Seperate input warning level and output warning level
+#######
+INWARN=${WARNING%,*}
+OUTWARN=${WARNING#*,}
+if [ $VERBOSITY -gt 1 ]; then
+    echo "Input warning level(${LABEL:-k}b/s): $INWARN"
+    echo "Output warning level(${LABEL:-k}b/s): $OUTWARN"
+fi
+
+#######
+#Seperate input critical level and output critical level
+#######
+INCRIT=${CRITICAL%,*}
+OUTCRIT=${CRITICAL#*,}
+if [ $VERBOSITY -gt 1 ]; then
+    echo "Input critical level (${LABEL:-k}b/s): $INCRIT"
+    echo "Output critical level (${LABEL:-k}b/s): $OUTCRIT"
+fi
+
+# Verify file exists and calculate current inbound or outbound bandwidth
+if [ -e "$FILE" ]; then
+    if [ $VERBOSITY -gt 0 ]; then
+        echo "Fetching data with command: rrdtool fetch $FILE AVERAGE -s-10minutes | grep -vi \"nan\""
+    fi
+    DATASET=`rrdtool fetch $FILE AVERAGE -s-10minutes| grep -vi "nan"`
+    if [ $VERBOSITY -gt 1 ]; then
+	echo "RRD File Data:"
+	echo "$DATASET"
+    fi
+    VALUEIN=`echo "$DATASET" | awk '{x=$2} END { printf("%f\n", x * 8) }'`
+    VALUEOUT=`echo "$DATASET" | awk '{x=$3} END { printf("%f\n", x * 8) }'`
+    if [ $VERBOSITY -gt 1 ]; then
+	echo "Raw Input Traffic Value (b/s): $VALUEIN"
+        echo "Raw Output Traffic Value (b/s): $VALUEOUT"
+    fi   
+    DVALUEIN=${VALUEIN%.*}
+    DVALUEOUT=${VALUEOUT%.*}
+    if [ $VERBOSITY -gt 1 ]; then
+	echo "Decimal Input Traffic Value (b/s): $DVALUEIN"
+	echo "Decimal Output Traffic Value (b/s): $DVALUEOUT"
+    fi
+# if DIV is not set (no label was given on the command line)
+# we figure the best label to use
+     if [ ! $DIV ]; then
+	#figure label for inbound traffic
+	if [ ${VALUEIN%.*} -le 1000 ]; then
+	    SDIVIN=1
+	    SLABELIN=""
+	elif [ $DVALUEIN -gt 1000 -a $DVALUEIN -le 1000000 ]; then
+	    SDIVIN=1000
+	    SLABELIN="K"
+	elif [ $DVALUEIN -gt 1000000 -a $DVALUEIN -le 1000000000 ]; then
+	    SDIVIN=1000000
+	    SLABELIN="M"
+	else
+	    SDIVIN=1000000000
+	    SLABELIN="G"
+	fi
+
+	#figure label for outbound traffic
+	if [ $DVALUEOUT -le 1000 ]; then
+            SDIVOUT=1   
+            SLABELOUT=""
+        elif [ $DVALUEOUT -gt 1000 -a $DVALUEOUT -le 1000000 ]; then
+            SDIVOUT=1000 
+            SLABELOUT="K"
+        elif [ $DVALUEOUT -gt 1000000 -a $DVALUEOUT -le 1000000000 ]; then
+            SDIVOUT=1000000
+            SLABELOUT="M"
+        else
+            SDIVOUT=1000000000
+            SLABELOUT="G"
+        fi
+	else
+	    SDIVIN=$DIV
+	    SDIVOUT=$DIV
+	    SLABELIN=$LABEL
+	    SLABELOUT=$LABEL
+    fi
+    if [ $VERBOSITY -gt 1 ]; then
+	echo "Traffic IN scalar: $SDIVIN"
+	echo "Traffic OUT scalar: $SDIVOUT"
+    fi
+
+
+    if [ $MAXAGE -ne 0 ]; then
+	if [ $VERBOSITY -gt 0 ]; then
+	    echo "Determining file age using command: stat $STATFLAGS $FILE"
+	fi
+	MODTIME=`stat $STATFLAGS $FILE`
+	CURTIME=`date +%s`
+	FILEAGE=`expr $CURTIME - $MODTIME`
+	if [ $VERBOSITY -gt 1 ]; then
+	    echo "File $FILE age (s): $FILEAGE"
+	fi
+    fi
+
+    if [ $FILEAGE -gt $MAXAGE ]; then
+	echo "WARNING - MRTG log file is older than maximum allowed threshold"
+	exit $STATE_WARNING
+    elif [ $(($DVALUEIN/${DIV:-1024})) -gt $INCRIT -o $(($DVALUEOUT/${DIV:-1024})) -gt $OUTCRIT ]; then
+        echo -n "CRITICAL - Current BW in: $(echo "scale=$SCALE; ($VALUEIN/$SDIVIN)"| bc)"$SLABELIN"bps Out: $(echo "scale=$SCALE; ($VALUEOUT/$SDIVOUT)"| bc)"$SLABELOUT"bps"
+	echo -n "|in=$(echo "scale=6; ($VALUEIN/$SDIVIN)"| bc)$SLABELIN""b/s;$INWARN;$INCRIT "
+	echo "out=$(echo "scale=6; ($VALUEOUT/$SDIVOUT)"| bc)$SLABELOUT""b/s;$OUTWARN;$OUTCRIT"
+        exit $STATE_CRITICAL
+    elif [ $(($DVALUEIN/${DIV:-1024})) -gt $INWARN -o $(($DVALUEOUT/${DIV:-1024})) -gt $OUTWARN ]; then
+        echo -n "WARNING - Current BW in: $(echo "scale=$SCALE; ($VALUEIN/$SDIVIN)"| bc)"$SLABELIN"bps Out: $(echo "scale=$SCALE; ($VALUEOUT/$SDIVOUT)"| bc)"$SLABELOUT"bps"
+	echo -n "|in=$(echo "scale=6; ($VALUEIN/$SDIVIN)"| bc)$SLABELIN""b/s;$INWARN;$INCRIT "
+        echo "out=$(echo "scale=6; ($VALUEOUT/$SDIVOUT)"| bc)$SLABELOUT""b/s;$OUTWARN;$OUTCRIT"
+        exit $STATE_WARNING
+    else
+        echo -n "OK - Current BW in: $(echo "scale=$SCALE; ($VALUEIN/$SDIVIN)"| bc)"$SLABELIN"bps Out: $(echo "scale=$SCALE; ($VALUEOUT/$SDIVOUT)"| bc)"$SLABELOUT"bps"
+	echo -n "|in=$(echo "scale=6; ($VALUEIN/$SDIVIN)"| bc)$SLABELIN""b/s;$INWARN;$INCRIT "
+        echo "out=$(echo "scale=6; ($VALUEOUT/$SDIVOUT)"| bc)$SLABELOUT""b/s;$OUTWARN;$OUTCRIT"
+        exit $STATE_OK
+    fi
+else
+    echo "$FILE does not exist."
+    exit $STATE_UNKNOWN
+fi
+
+exit $exitstatus

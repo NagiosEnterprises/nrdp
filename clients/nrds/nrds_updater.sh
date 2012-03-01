@@ -30,6 +30,12 @@ print_help() {
     echo ""
     exit 0
 }
+get_os_info() {
+#this needs some help to better detect everything
+OS=$(uname)
+ARCH=$(uname -m)
+OS_VER=""
+}
 update_plugins() {
     for (( i=0; i < ${#service[*]}; i++ ))
     do
@@ -47,9 +53,9 @@ update_plugins() {
             chown nagios:nagios "$DIRNAME"
         fi
         if [ "$curl" ];then
-            `curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+            `curl -o ${full_plugin_path} --silent -d "token=$TOKEN&cmd=getplugin&plugin=$plugin_name&os=$OS&arch=$ARCH&os_ver=$OS_VER" $URL`
         else
-            `wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name" $URL`
+            `wget -qO ${full_plugin_path} --post-data="token=$TOKEN&cmd=getplugin&plugin=$plugin_name&os=$OS&arch=$ARCH&os_ver=$OS_VER" $URL`
         fi
         # add permission changes here ?
         chown nagios:nagios "${full_plugin_path}"
@@ -161,7 +167,7 @@ then
     echo "Either curl or wget are required to run this script"
     exit 1
 fi
-
+get_os_info
 process_config
 if [[ "${URL}" =~ "localhost" ]];then
     echo "ERROR: This should not be run on the localhost"

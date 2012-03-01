@@ -1,0 +1,252 @@
+#!/usr/bin/perl -w
+#
+# check_sip plugin for nagios
+# $Revision: 1.2 $
+#
+# Nagios plugin to check SIP servers
+#
+# By Sam Bashton, Bashton Ltd
+# bashton.com/content/nagiosplugins
+# Michael Hirschbichler, Institute of Broadband Communications, 
+#  Vienna University of Technology
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+use strict;
+use lib "/usr/local/nagios/libexec";
+use utils qw($TIMEOUT %ERRORS &print_revision &support);
+use vars qw($PROGNAME);
+use IO::Socket::INET;
+#use Sys::Hostname;
+use Time::HiRes qw(gettimeofday);
+use Net::Domain qw (hostname hostfqdn hostdomain);
+
+$PROGNAME = "check_sip";
+my $VERSION  = "1.2";
+
+$ENV{'BASH_ENV'}=''; 
+$ENV{'ENV'}='';
+$ENV{'PATH'}='';
+$ENV{'LC_ALL'}='C';
+
+my ($opt_V,$opt_h,$opt_u,$opt_p,$opt_H, $opt_w, $opt_s, $opt_f);
+$opt_V = $opt_h = $opt_u = $opt_p = $opt_H = $opt_w = $opt_s = $opt_f = '';
+
+my $state = 'UNKNOWN';
+
+use Getopt::Long;
+Getopt::Long::Configure('bundling');
+GetOptions(
+  "V"   => \$opt_V,   "version"       => \$opt_V,
+  "h"   => \$opt_h,   "help"          => \$opt_h,
+  "s"   => \$opt_s,
+  "f=s" => \$opt_f,   "fromuri=s"     => \$opt_f,
+  "u=s" => \$opt_u,   "uri=s"         => \$opt_u,
+  "p=s" => \$opt_p,   "port=s"        => \$opt_p,
+  "H=s" => \$opt_H,   "host=s"        => \$opt_H,
+  "w=s" => \$opt_w,   "warn=s"	      => \$opt_w
+);
+
+# -h displays help
+if ($opt_h) { printHelp(); exit $ERRORS{'OK'}; }
+
+# -V display version number
+if ($opt_V) {
+  print_revision($PROGNAME, $VERSION);
+  exit $ERRORS{'OK'};
+};
+
+#  Check the sip URI is OK
+unless ($opt_u) { printHelp(); exit $ERRORS{'UNKNOWN'} }
+
+# Port is 5060 unless otherwise specified
+unless ($opt_p) { $opt_p = 5060 }
+
+# Determine the host from the sip URI if it wasn't specified with -H
+unless ($opt_H) { $opt_H = hostFromURI($opt_u) }
+
+# Check the host is valid
+unless (utils::is_hostname($opt_H))
+{
+  print "$opt_H is not a valid hostname\n";
+  printHelp();
+  exit $ERRORS{"UNKNOWN"};
+}
+
+unless ($opt_w) { $opt_w = 5 } # Warn if response takes longer than 5 seconds
+
+### Main code ###############################################################
+
+# Timeout if we don't recieve a response within a suitable timeframe..
+$SIG{'ALRM'} = sub {
+  print ("SIP timeout: No response from SIP server after $TIMEOUT seconds\n");
+  exit $ERRORS{"CRITICAL"};
+};
+alarm($TIMEOUT);
+
+my $localhost = hostfqdn();
+$opt_f = getFromURI($opt_f,$localhost,$opt_p);
+my $user=getUserPart($opt_f);
+my $socket = uconnect($opt_H, $opt_p);
+my @localinfo = unpack_sockaddr_in($socket->sockname);
+my $req = buildReq($localinfo[0], $opt_u, $opt_f,$user,$localhost);
+my (undef, $starttime) = gettimeofday;
+$socket->send($req);
+my $response;
+$socket->recv($response, 1024) or $state = 'CRITICAL';
+
+#get rid of the 100 Trying - provisional response ...
+if (getResponseCode($response) eq "100"){
+  $socket->recv($response, 1024) or $state = 'CRITICAL';
+}
+
+my (undef, $finishtime) = gettimeofday;
+my $rtime = ($finishtime - $starttime) / 1000000; # Time taken in seconds
+if(checkResponse($response,$rtime,$opt_s)) 
+{ 
+  if ($rtime > $opt_w) { $state = 'WARNING' }
+  else { $state = 'OK' }
+}
+else { $state = 'CRITICAL' }
+
+exit $ERRORS{$state};
+
+### Subroutines ##############################################################
+
+
+sub uconnect
+{
+  my ($host, $port) = @_;
+  my $socket = new IO::Socket::INET->new(PeerPort=>$port, Proto=>'udp', PeerAddr=>$host);
+  unless ($socket) { print "Unable to connect to $host\n"; exit $ERRORS{'UNKNOWN'} }
+  return $socket;
+}
+
+sub getFromURI{
+  my ($from, $localhost,$localport) = @_;
+  if (!("$from" eq "")){
+    return "$from:$localport";
+  }else
+  {
+    return "sip:checksip\@$localhost:$localport";
+  }
+}
+
+sub getUserPart{
+  my ($uri) = @_;
+  my @uris=split(/\@/,$uri);
+  my $user=$uris[0];
+  return $user;
+}
+
+sub hostFromURI
+{
+  my ($uri) = @_;
+  $uri =~ s/sip:[^\@]+@//;
+  return $uri;
+}
+
+sub getResponseCode
+{
+  my ($message) = @_;
+  my @messageparts=split(/\ /,$message);
+  return $messageparts[1];
+}
+
+sub buildReq
+{
+  my ($localport, $dsturi, $fromuri,$user,$localhost) = @_;
+  
+  my $req;
+  my $tag = genTag();
+  my $idtag = genTag();
+  $req.= "OPTIONS $dsturi SIP/2.0\r\n";
+  $req.= "Via: SIP/2.0/UDP $localhost:$localport;branch=z9hG4bKhjhs8ass877\r\n";
+  $req.= "Max-Forwards: 70\r\n";
+  $req.= "To: $dsturi\r\n";
+  $req.= "From: $fromuri;tag=$tag\r\n";
+  $req.= "Call-ID: $idtag\@$localhost\r\n";
+  $req.= "CSeq: 1 OPTIONS\r\n";
+  $req.= "Contact: <$user\@$localhost:$localport>\r\n";
+  $req.= "Accept: application/sdp\r\n";
+  $req.= "Content-Length: 0\r\n\r\n";
+  return $req;
+}
+
+sub genTag
+{
+  my $tag;
+  my @chars = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+  'q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8',
+  '9');
+
+  for (my $i = 0; $i < 6; $i++)
+  {
+    $tag .= $chars[rand(scalar @chars)];
+  }
+  return $tag;
+}
+
+sub printHelp
+{
+  print "This plugin tests the sip service on the specified host.\n\n";
+  print "Usage: $PROGNAME -u sip:uri\@example.com [-H host -p PORT -f sip:fromuri\@example.com -w WARNTIME -s]\n";
+  print "       $PROGNAME [-h | --help]\n";
+  print "       $PROGNAME [-V | --version]\n\n";
+  print "Options:\n";
+  print " -u sip:uri\@example.com\n";
+  print "   Full SIP uri, eg sip:uri\@example.com\n";
+  print " -h, --help\n";
+  print "   Print this help\n";
+  print " -V, --version\n";
+  print "   Print version information\n";
+  print " -H host\n";
+  print "   Host name or IP Address to connect to\n";
+  print " -p port\n";
+  print "   Port to connect to\n";
+  print " -f sip:fromuri\@example.com\n";
+  print "   Full SIP uri, will be used for the \"From:\"-Header\n";
+  print " -s\n";
+  print "   Changes default behavior: all SIP-responses will result in an \"OK\"\n\n";
+
+
+}
+
+sub checkResponse
+{
+  my ($response, $rtime, $sp_behavior) = @_;
+  my @header=split(/\r/,$response);
+  my $tstring=$header[0];
+  my $rcode=getResponseCode($response);  
+  if (!$sp_behavior){
+    #in this case, we want to see if the SIP-server is respoding positively to our request
+    # Some SUT respond with 100 Trying - assume everything is OK if we get this
+    if  ($response =~ /^SIP.+[12]00/){
+      print "$tstring, $rtime seconds response time|rtt=".$rtime."s;0.5s;1s;0:10; code=".$rcode."\n";
+      return 1;
+    } 
+    elsif ($response =~ /^SIP.+404 Not Found/) { 
+      print "$tstring, $rtime seconds response time|rtt=".$rtime."s;0.5s;1s;0:10; code=".$rcode."\n"; 
+      return 0 }
+    else { print "Unknown error: $tstring, $rtime seconds response time|rtt=".$rtime."s;0.5s;1s;0:10; code=".$rcode."\n"; return 0; }
+  }else{
+    #in this case, we accept every response from the server, as long it is SIP
+    if  ($response =~ /^SIP./){
+      print "$tstring, $rtime seconds response time|rtt=".$rtime."s;0.5s;1s;0:10; code=".$rcode."\n";
+      return 1;
+    } 
+    else { print "Unknown error: $tstring, $rtime seconds response time|rtt=".$rtime."s;0.5s;1s;0:10; code=".$rcode."\n"; return 0; }
+  }
+}

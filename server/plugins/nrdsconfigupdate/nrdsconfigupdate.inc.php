@@ -101,7 +101,7 @@ function nrds_get_plugin(){
         Windows
         Generic
     */
-    
+    if (fnmatch("i[3-6]86",$arch)) $arch="i386";
     //These are the potential plugin paths, they will be searched in order
     $possible_plugin_paths = array(
         "{$cfg['plugin_root']}/$os/$arch/$os_ver/$plugin",
