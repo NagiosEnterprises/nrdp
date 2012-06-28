@@ -89,7 +89,8 @@ function nagioscorepassivecheck_submit_check_data(){
 		$hostname=strval($cr->hostname);
 		$state=intval($cr->state);
 		$output=strval($cr->output);
-		
+		$output=str_replace("\n", "\\n", $output);
+        
 		// service checks
 		if($type=="service"){
 			$servicename=strval($cr->servicename);
