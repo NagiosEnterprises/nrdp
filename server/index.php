@@ -63,6 +63,12 @@ function route_request(){
 function submit_nagios_command($raw=false){
 	global $cfg;
 	
+    // If commands are disallowed in the config...
+    if($cfg["disable_external_commands"] === TRUE) {
+        handle_api_error(ERROR_DISABLED_COMMAND);
+        return;
+    }
+    
 	$command=grab_request_var("command");
 	
 	// make sure we have a command

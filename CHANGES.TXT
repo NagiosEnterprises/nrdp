@@ -1,3 +1,7 @@
+10/10/2013
+----------
+- Added the ability to disabled external commands in the config - NS
+
 06/28/2012
 ----------------
 - Changed to add support for multi-line output -SW
