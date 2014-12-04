@@ -27,7 +27,7 @@ function route_request(){
 	
 	$cmd=strtolower(grab_request_var("cmd"));
 	
-	// token if required for most everyting
+	// token if required for most everything
 	if($cmd!="" && $cmd!="hello")
 		check_token();
 		
