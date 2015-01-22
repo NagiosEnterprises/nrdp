@@ -1,10 +1,9 @@
 <?php
 //
 // NRDP Constants
-// Copyright (c) 2008 Nagios Enterprises, LLC.
+// Copyright (c) 2008-2015 Nagios Enterprises, LLC. All rights reserved.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
-// $Id: constants.inc.php 12 2010-06-19 04:19:35Z egalstad $
 
 // ERROR STRINGS
 define("ERROR_CAPABILITY_NOT_ENABLED","NOT ENABLED");
@@ -44,8 +43,5 @@ define("ERROR_READ_STATUS_FILE","UNABLE TO READ STATUS FILE");
 define("ERROR_NO_DATA","NO DATA");
 define("ERROR_BAD_XML","BAD XML");
 
-
 // CALLBACKS
 define("CALLBACK_PROCESS_REQUEST","PROCESS_REQUEST");
-
-?>
