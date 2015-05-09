@@ -205,7 +205,7 @@ function xmlentities($uncleaned){
         "&",
         "\"",
         "'",
-        "’"
+        "â€™"
         );
     $replace=array(
         "&lt;",
@@ -344,10 +344,14 @@ function count_nrdp_callbacks($cbtype){
 }
 
 if (!function_exists('register_callback')) {
-function register_callback($cbtype,$func){
+function register_callback($cbtype,$func,$prepend=null){
     global $callbacks;
     
-    $callbacks[$cbtype][]=$func;
+    if ($prepend) {
+        array_unshift($callbacks[$cbtype], $func);
+    } else {
+        $callbacks[$cbtype][]=$func;
+    }
     
     //echo "CALLBACKS:<BR>";
     //print_r($callbacks);
