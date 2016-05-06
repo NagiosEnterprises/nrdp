@@ -1,4 +1,4 @@
-NRPE Installation Instructions
+NRDP Installation Instructions
 ==============================
 
 1. Create a directory for the NRDP server files
