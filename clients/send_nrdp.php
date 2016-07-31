@@ -299,7 +299,7 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
 		$options['timeout']=15;
 
     $url_parts = parse_url($url);
-    if ($url_parts['port'] != "") { $port=":" . $url_parts['port']; } else { $port="80:"; }
+    if ($url_parts['port'] != "") { $port=":" . $url_parts['port']; } else { $port=":80"; }
 
     $info = array(//Currently only supported by curl.
         'http_code'    => 200
