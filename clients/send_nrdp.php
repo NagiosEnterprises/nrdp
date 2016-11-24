@@ -314,13 +314,23 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
     //If curl is available, use curl to get the data.
     if(function_exists("curl_init") 
                 and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't user curl if it is specifically stated to user fsocketopen in the options
+        // Default port to use
+        $port = 80;
+        if(isset($options['scheme']) && preg_match("#https#i", $url_parts['scheme']) == 1){
+           // Change it to a secure port
+           $port = 443;
+        }
+        if(isset($url_parts['port']) and is_int($url_parts['port'])){
+           // a port was specified; let's use it instead
+           $port=$url_parts['port'];
+        }
         if(isset($options['method']) and $options['method'] == 'post') {
-            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
+            $page = $url_parts['scheme'] . '://' . $url_parts['host'] .":$port". $url_parts['path'];
         } else {
             $page = $url;
         }
 
-        $ch = curl_init($url_parts['host']);
+        $ch = curl_init($page);
 
 	// added 04-28-08 EG set a timeout
 	if(isset($options['timeout']))
