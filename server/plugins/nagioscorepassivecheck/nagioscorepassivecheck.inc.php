@@ -74,7 +74,10 @@ function nagioscorepassivecheck_submit_check_data(){
 		handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
 		
 	$total_checks=0;
-		
+
+	// restrict permission to write only for owner only
+	umask(0577);
+
 	// process each result
 	foreach($xml->checkresult as $cr){
 	
@@ -116,14 +119,16 @@ function nagioscorepassivecheck_submit_check_data(){
 		// close the file
 		fclose($fh);
 		
+		// create an ok-to-go, so Nagios Core picks it up
+		$fh=fopen($tmpname.".ok","w");
+		fclose($fh);
+
 		// change ownership and perms
 		chgrp($tmpname,$cfg["nagios_command_group"]);
-		chmod($tmpname,0770);
-		
-		// create an ok-to-go, so Nagios Core picks it up
-		$fh=fopen($tmpname.".ok","w+");
-		fclose($fh);
-		
+		chgrp($tmpname.".ok",$cfg["nagios_command_group"]);
+		chmod($tmpname,0660);
+		chmod($tmpname.".ok",0660);
+
 		$total_checks++;
 		}
 	
