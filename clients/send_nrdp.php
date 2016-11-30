@@ -415,7 +415,7 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
         $body = "";
         $headers['Status'] = 404;
     } else {
-        //Seperate header and content
+        //Separate header and content
 	//echo "RESPONSE: ".$response."<BR><BR>\n";
 	//exit();
         $separator_position = strpos($response,"\r\n\r\n");
