@@ -299,6 +299,7 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
 		$options['timeout']=15;
 
     $url_parts = parse_url($url);
+    if ($url_parts['port'] != "") { $port=":" . $url_parts['port']; } else { $port=":80"; }
 
     $info = array(//Currently only supported by curl.
         'http_code'    => 200
@@ -315,7 +316,7 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
     if(function_exists("curl_init") 
                 and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { //Don't user curl if it is specifically stated to user fsocketopen in the options
         if(isset($options['method']) and $options['method'] == 'post') {
-            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . $url_parts['path'];
+            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . $port . $url_parts['path'];
         } else {
             $page = $url;
         }
@@ -365,7 +366,7 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false)) {
             $page = $url_parts['path'];
         }
 
-        $fp = fsockopen($url_parts['host'], 80, $errno, $errstr, 30);
+        $fp = fsockopen($url_parts['host'], $port, $errno, $errstr, 30);
         if ($fp) {
 	
 		// added 04-28-08 EG set a timeout
