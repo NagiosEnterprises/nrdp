@@ -26,13 +26,13 @@ Installation
     vi /usr/local/nrdp/server/config.inc.php
     
 And add at least one token string to the $cfg['authorized_tokens'] variable. Example::
-    
+
     $cfg['authorized_tokens'] = array(
         "asd7fjk3l34",
         "df23m7jadI34"
     );
     
-5. Configure Apache depending on the version and operating system you may need to change this location.:
+5. Configure Apache depending on the version and operating system you may need to change this location::
 
     cp nrdp.conf /etc/httpd/conf.d
     /etc/init.d/httpd restart
