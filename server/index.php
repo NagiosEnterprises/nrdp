@@ -1,85 +1,79 @@
 <?php
 //
 // Nagios Remote Data Processor (NRDP)
-// Copyright (c) 2010 Nagios Enterprises, LLC.
+// Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
 //
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
-// $Id: index.php 12 2010-06-19 04:19:35Z egalstad $
 
 require_once(dirname(__FILE__).'/config.inc.php');
 require_once(dirname(__FILE__).'/includes/utils.inc.php');
 
-// load plugins
+// Load plugins
 load_plugins();
 
-// grab GET or POST variables 
+// Setup and authenticate
 grab_request_vars();
-
-// check authorization
 check_auth();
 
-// handle the request
+
 route_request();
 
 
-function route_request(){
-	
-	$cmd=strtolower(grab_request_var("cmd"));
-	
-	// token if required for most everyting
-	if($cmd!="" && $cmd!="hello")
+function route_request()
+{
+	$cmd = strtolower(grab_request_var("cmd"));
+
+	// Token if required for most everyting
+	if ($cmd != "" && $cmd != "hello") {
 		check_token();
-		
-	//echo "CMD='$cmd'<BR>";
-		
-	switch($cmd){
-	
-		// say hello
+	}
+
+	switch ($cmd)
+	{
+		// Say hello
 		case "hello":
 			say_hello();
 			break;
-		// display a form for debugging/testing
+
+		// Display a form for debugging/testing
 		case "":
 			display_form();
 			break;
-			
+
+		// Let the plugins handle output
 		default:
-			//echo "PASSING TO PLUGINS<BR>";
-			// let plugins handle the output
-			$args=array(
-				"cmd" => $cmd,
-				);
-			do_callbacks(CALLBACK_PROCESS_REQUEST,$args);
+			$args = array(
+				"cmd" => $cmd
+			);
+			do_callbacks(CALLBACK_PROCESS_REQUEST, $args);
 			break;
-		}
-		
+	}
+
 	echo "NO REQUEST HANDLER";
 
 	exit();
-	}
+}
 
 
-function say_hello(){
-	
+function say_hello()
+{
 	output_api_header();
-	
+
 	echo "<response>\n";
 	echo "  <status>0</status>\n";
 	echo "  <message>OK</message>\n";
 	echo "  <product>".get_product_name()."</product>\n";
 	echo "  <version>".get_product_version()."</version>\n";
 	echo "</response>\n";
-	
+
 	exit();
-	}
+}
 
 
-function display_form(){
-
-	
-
-	$mytoken="test";
+function display_form()
+{
+	$mytoken = "test";
 ?>
 	<strong>Submit Nagios Command:</strong><br>
 	<form action="" method="get">
@@ -97,7 +91,7 @@ function display_form(){
 	Token: <input type="text" name="token" value="" size="15"><br>
 	Check Data:<br>
 <?php
-$xml="
+$xml = "
 <?xml version='1.0'?> 
 <checkresults>
 	<checkresult type='host'>
@@ -119,25 +113,27 @@ $xml="
 	</form>
 <?php
 	exit();
-	}
-	
+}
 
-function load_plugins(){
 
-	// include all plugins
-	$p=dirname(__FILE__)."/plugins/";
-	$subdirs=scandir($p);
-	foreach($subdirs as $sd){
-		if($sd=="." || $sd=="..")
+// Load all the plugins from the plugin folder
+function load_plugins()
+{
+	$p = dirname(__FILE__)."/plugins/";
+	$subdirs = scandir($p);
+	foreach ($subdirs as $sd) {
+		if ($sd == "." || $sd == "..") {
 			continue;
-		$d=$p.$sd;
-		if(is_dir($d)){
-			$pf=$d."/$sd.inc.php";
-			if(file_exists($pf)){
-				//echo "REGISTERING PLUGIN: $pf<BR>";	
+		}
+		$d = $p.$sd;
+		if (is_dir($d)) {
+			$pf = $d."/$sd.inc.php";
+			if (file_exists($pf)) {
 				include_once($pf);
-				}
 			}
 		}
 	}
+}
+
+
 ?>

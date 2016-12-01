@@ -1,8 +1,15 @@
 #!/usr/bin/env python
-# Copyright (c) 2010-2012 Nagios Enterprises, LLC.
+#
+# send_nrdp.py
+#
+# Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
 # Written by: Scott Wilkerson (nagios@nagios.org)
+#
+
 import optparse, sys, urllib, cgi
 from xml.dom.minidom  import parseString
+
+
 class send_nrdp:
     options = [
         optparse.make_option('-u', '--url', action="store",
@@ -16,9 +23,9 @@ class send_nrdp:
         optparse.make_option('-S', '--state', action="store",
             dest="state", help="An integer indicating the current state of the host or service."),
         optparse.make_option('-o', '--output', action="store",
-            dest="output", help="Text output to be sent as the passive check result.  Newlines should be encoded with encoded newlines (\\n)."),
+            dest="output", help="Text output to be sent as the passive check result. Newlines should be encoded with encoded newlines (\\n)."),
         optparse.make_option('-d', '--delim', action="store",
-            dest="delim", help="With only the required parameters send_nrdp.py is capable of processing data piped to it either from a file or other process.  By default, we use t as the delimiter however this may be specified with the -d option data should be in the following formats one entry per line."),
+            dest="delim", help="With only the required parameters send_nrdp.py is capable of processing data piped to it either from a file or other process. By default, we use t as the delimiter however this may be specified with the -d option data should be in the following formats one entry per line."),
         optparse.make_option('-c', '--checktype', action="store",
             dest="checktype", help="1 for passive 0 for active")
     ]
@@ -36,6 +43,7 @@ class send_nrdp:
             sys.exit()
         except Exception, e:
             sys.exit(e)
+
     def getText(self, nodelist):
         rc = []
         for node in nodelist:
@@ -66,7 +74,7 @@ class send_nrdp:
             options.checktype = "1"
         xml="<?xml version='1.0'?>\n<checkresults>\n";
         
-        # it is possible this may not work on windows systems...
+        # It is possible this may not work on windows systems ...
         if not sys.stdin.isatty():
             for line in sys.stdin.readlines():
                 parts = line.split(options.delim)
@@ -104,8 +112,6 @@ class send_nrdp:
                     xml += "</checkresult>"
                 xml += "</checkresults>"
                 self.post_data(options.url, options.token, xml)
+
 if __name__ == "__main__":
-    send_nrdp().run()     
-
-
-
+    send_nrdp().run()

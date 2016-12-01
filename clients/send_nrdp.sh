@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# Copyright (c) 2010-2012 Nagios Enterprises, LLC.
+# check_nrdp.sh
+#
+# Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
 # Written by: Scott Wilkerson (nagios@nagios.org)
 #
-###########################
 
 PROGNAME=$(basename $0)
 RELEASE="Revision 0.3"
@@ -11,6 +12,7 @@ RELEASE="Revision 0.3"
 print_release() {
     echo "$RELEASE"
 }
+
 print_usage() {
     echo ""
     echo "$PROGNAME $RELEASE - Send NRPD script for Nagios"

@@ -1,10 +1,10 @@
 <?php
 //
 // Nagios Core Command NRDP Plugin
-// Copyright (c) 2010 Nagios Enterprises, LLC.
+//
+// Copyright (c) 2010-2016 - Nagios Enterprises, LLC. All rights reserved.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
-// $Id: utils.inc.php 12 2010-06-19 04:19:35Z egalstad $
 
 require_once(dirname(__FILE__).'/../../config.inc.php');
 require_once(dirname(__FILE__).'/../../includes/utils.inc.php');

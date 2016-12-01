@@ -1,5 +1,0 @@
-#!/bin/sh
-
-cp -r * /usr/local/nrdp
-chown -R nagios.nagios /usr/local/nrdp
-
