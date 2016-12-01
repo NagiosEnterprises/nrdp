@@ -42,6 +42,9 @@ $cfg["check_results_dir"] = "/usr/local/nagios/var/spool/checkresults";
 // Should we allow external commands? Set to true or false (Boolean, not a string)
 $cfg["disable_external_commands"] = false;
 
+// Allows Nagios XI to send old check results directly into NDO if configured
+$cfg["allow_old_results"] = false;
+
 
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 
