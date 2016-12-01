@@ -15,17 +15,17 @@ Download the latest tarball and extract to start the install::
     tar xvf 1.3.1.tar.ggz
     cd nrdp-*
 
-Create a directory and move the NRDP files into place. You don't need to install most of the files outside of server, so we omit them from the cp command.:
+Create a directory and move the NRDP files into place. You don't need to install most of the files outside of server, so we omit them from the cp command::
 
     mkdir /usr/local/nrdp
     cp -r clients server LICENSE* CHANGES* /usr/local/nrdp
     chown -R nagios:nagios /usr/local/nrdp
 
-Edit the NRDP server config file and add your token to the `$cfg['authorized_tokens']` variable. See example in configuration if you don't know how to create one.:
+Edit the NRDP server config file and add your token to the `$cfg['authorized_tokens']` variable. See example in configuration if you don't know how to create one::
 
     vi /usr/local/nrdp/server/config.inc.php
     
-Configure Apache depending on the curren Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6.:
+Configure Apache depending on the curren Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6::
 
     cp nrdp.conf /etc/httpd/conf.d
     service httpd restart
