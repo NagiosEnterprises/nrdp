@@ -4,6 +4,7 @@
 - Updated send_nrdp.sh to the latest revision -JO
 - Updated with code for injecting directly into NDO if sent past check results -JO
 - Fixed issue with send_nrdp.php not respecting ports (patched by ericloyd) -JO
+- Fixed issue where check_results_dir is not writeable and they get written to /tmp and gives errors instead -JO
 
 1.3.1 - 01/22/2015
 ------------------

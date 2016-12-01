@@ -136,8 +136,16 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     global $cfg;
 
     ////// WRITE THE CHECK RESULT //////
-    // create a temp file to write to
+
+    // Create a temp file to write to
     $tmpname = tempnam($cfg["check_results_dir"], "c");
+
+    // Check if the file is in the check_results_dir
+    if (strpos($tmpname, $cfg["check_results_dir"]) === false) {
+        unlink($tmpname);
+        handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
+    }
+
     $fh = fopen($tmpname, "w");
 
     fprintf($fh, "### NRDP Check ###\n");
