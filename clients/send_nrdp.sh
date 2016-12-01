@@ -7,7 +7,7 @@
 #
 
 PROGNAME=$(basename $0)
-RELEASE="Revision 0.3"
+RELEASE="Revision 0.5"
 
 print_release() {
     echo "$RELEASE"
@@ -84,14 +84,24 @@ print_help() {
 }
 
 send_data() {
-    pdata="token=$token&cmd=submitcheck&XMLDATA=$1"
-    if [ $curl ];then
-        rslt=`curl -f --silent -d "$pdata" "$url/"`
+    pdata="token=$token&cmd=submitcheck"
+    if [ ! "x$curl" == "x" ];then
+
+        if [ $file ]; then
+            fdata="--data-urlencode XMLDATA@$file"
+            rslt=`curl -f --silent --insecure -d "$pdata" $fdata "$url/"`
+        else
+            pdata="$pdata&XMLDATA=$1"
+            rslt=`curl -f --silent --insecure -d "$pdata" "$url/"`
+        fi
+        
         ret=$?
     else
+        pdata="$pdata&XMLDATA=$1"
         rslt=`wget -q -O - --post-data="$pdata" "$url/"`
         ret=$?
     fi
+
     status=`echo $rslt | sed -n 's|.*<status>\(.*\)</status>.*|\1|p'`
     message=`echo $rslt | sed -n 's|.*<message>\(.*\)</message>.*|\1|p'`
     if [ $ret != 0 ];then
@@ -126,6 +136,7 @@ send_data() {
     if [ $2 ] && [ "$status" == "0" ];then
         rm -f "$2"
     fi
+
     # If we weren't successful error
     if [ $ret != 0 ];then
         echo "exited with error "$ret
@@ -167,20 +178,23 @@ then
   exit 1
 fi
 # detecting curl 
-if which curl > /dev/null; 
+if [[ `which curl` =~ "/curl" ]]
  then curl=1; 
 fi
 # detecting wget if we don't have curl
-if [ ! $curl ] && [ which wget > /dev/null ];
-  then wget=1;
+if [[ `which wget` =~ "/wget" ]]
+then
+    wget=1;
 fi
 
 if [[ ! $curl && ! $wget ]];
 then
-  echo "Either curl or wget are required to run this script"
+  echo "Either curl or wget are required to run $PROGNAME"
   exit 1
 fi
+
 checkcount=0
+
 if [ $host ]; then
     xml=""
     # we are not getting piped results
@@ -189,17 +203,20 @@ if [ $host ]; then
         exit 2
     fi
     if [ "$service" != "" ]; then
-        xml=$xml"<checkresult type='service' checktype='"$checktype"'>"
-        xml=$xml"<servicename>"$service"</servicename>"
+        xml="$xml<checkresult type='service' checktype='$checktype'><servicename>$service</servicename>"
     else
-        xml=$xml"<checkresult type='host' checktype='"$checktype"'>"
+        xml="$xml<checkresult type='host' checktype='$checktype'>"
     fi
-    xml=$xml"<hostname>"$host"</hostname>"
-    xml=$xml"<state>"$State"</state>"
-    xml=$xml"<output>"$output"</output>"
-    xml=$xml"</checkresult>"
+    
+    # urlencode XML special chars
+    output=${output//&/%26}
+    output=${output//</%3C}
+    output=${output//>/%3E}
+    
+    xml="$xml<hostname>$host</hostname><state>$State</state><output><![CDATA["$output"]]></output></checkresult>"
     checkcount=1
 fi
+
 # Detect STDIN
 ########################
 if [ ! -t 0 ]; then
@@ -214,45 +231,44 @@ if [ ! -t 0 ]; then
                 echo "ERROR: STDIN must be either 3 or 4 fields long, I found "${#arr[@]}
             else
                 if [ ${#arr[@]} == 4 ]; then
-                    xml=$xml"<checkresult type='service' checktype='"$checktype"'>"
-                    xml=$xml"<servicename>"${arr[1]}"</servicename>"
-                    xml=$xml"<hostname>"${arr[0]}"</hostname>"
-                    xml=$xml"<state>"${arr[2]}"</state>"
-                    xml=$xml"<output>"${arr[3]}"</output>"
+                    xml="$xml<checkresult type='service' checktype='$checktype'>
+                    <servicename>${arr[1]}</servicename>
+                    <hostname>${arr[0]}</hostname>
+                    <state>${arr[2]}</state>
+                    <output>${arr[3]}</output>"
                 else
-                    xml=$xml"<checkresult type='host' checktype='"$checktype"'>"
-                    xml=$xml"<hostname>"${arr[0]}"</hostname>"
-                    xml=$xml"<state>"${arr[1]}"</state>"
-                    xml=$xml"<output>"${arr[2]}"</output>"
+                    xml="$xml<checkresult type='host' checktype='$checktype'>
+                    <hostname>${arr[0]}</hostname>
+                    <state>${arr[1]}</state>
+                    <output>${arr[2]}</output>"
                 fi
                 
-                xml=$xml"</checkresult>"
+                xml="$xml</checkresult>"
                 checkcount=$[checkcount+1]
             fi
         fi
     done
     IFS=" "
 fi
-if [ $host ] || [ ! -t 0 ] ;then
-    xml="<?xml version='1.0'?><checkresults>"$xml"</checkresults>"
-    send_data "$xml"
-    echo "Sent $checkcount checks to $url"
-fi
-if [ $file ];then
+
+if [ $file ]; then
     xml=`cat $file`
     send_data "$xml"
 fi
-if [ $directory ];then
+
+if [ $directory ]; then
     #echo "Processing directory..."
     for f in `ls $directory`
     do
       #echo "Processing $f file..."
       # take action on each file. $f store current file name
       xml=`cat $directory/$f`
-      #echo $xml
       send_data "$xml" "$directory/$f"
     done
-    
 fi
 
-
+if [ "x$file" == "x" ] && [ "x$directory" == "x" ]; then
+    xml="<?xml version='1.0'?><checkresults>$xml</checkresults>"
+    send_data "$xml"
+    echo "Sent $checkcount checks to $url"
+fi
