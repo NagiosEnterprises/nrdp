@@ -42,11 +42,6 @@ $cfg["check_results_dir"] = "/usr/local/nagios/var/spool/checkresults";
 // Should we allow external commands? Set to true or false (Boolean, not a string)
 $cfg["disable_external_commands"] = false;
 
-// Full path to directory where temp scratch files can be written
-// NOTE: The Apache user need to be able create files here, and the Nagios user needs to read/delete
-// those same files, so the /tmp system directory won't work (it has a sticky bit on it)
-$cfg["tmp_dir"] = "/usr/local/nagios/var/tmp";
-
 
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 
