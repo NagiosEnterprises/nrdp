@@ -1,6 +1,7 @@
 ﻿1.4.0 - ??/??/2016
 ------------------
 - Added option to callback funciton for prepending instead of appending to callback array (added by tmcnag) -JO
+- Updated send_nrdp.sh to the latest revision -JO
 - Fixed issue with send_nrdp.php not respecting ports (patched by ericloyd) -JO
 
 1.3.1 - 01/22/2015

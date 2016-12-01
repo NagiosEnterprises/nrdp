@@ -3,7 +3,7 @@ Version: 0.20150122gitbd1b5d0
 Release: 2%{?dist}
 Summary: Nagios Remote Data Processor
 
-License: GPLv2 and BSD
+License: NOSL and BSD
 URL: https://github.com/NagiosEnterprises/nrdp    
 # wget https://github.com/NagiosEnterprises/nrdp/archive/master.tar.gz
 # mv master.tar.gz nrdp-VERSION.tar.gz

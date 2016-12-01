@@ -10,10 +10,10 @@
 // a client request must contain a valid token in order for the NRDP to response or honor the request
 // NOTE: Tokens are just alphanumeric strings - make them hard to guess!
 $cfg['authorized_tokens'] = array(
-	//"mysecrettoken",  // <-- not a good token
-	//"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
+    //"mysecrettoken",  // <-- not a good token
+    //"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
 );
-	
+    
 // Do we require that HTTPS be used to access NRDP?
 // set this value to 'false' to disable HTTPS requirement
 $cfg["require_https"] = false;
@@ -25,9 +25,9 @@ $cfg["require_basic_auth"] = false;
 // What basic authentication users are allowed to access NRDP?
 // comment this variable out to allow all authenticated users access to the NRDP
 $cfg["valid_basic_auth_users"] = array(
-	"nrdpuser"
+    "nrdpuser"
 );
-	
+    
 // The name of the system group that has write permissions to the external command file
 // this group is also used to set file permissions when writing bulk commands or passive check results
 // NOTE: both the Apache and Nagios users must be a member of this group

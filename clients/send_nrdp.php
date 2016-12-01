@@ -1,5 +1,6 @@
 #!/usr/bin/php -q
 <?php
+//
 // send_nrdp.php
 //
 // Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
@@ -29,6 +30,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
+//
 
 
 doit();

@@ -8,35 +8,32 @@ By default, NRDP has the capability of allowing remote agents, applications, and
 Installation
 ------------
 
-1. Create a directory for the NRDP server files::
+Download the latest tarball and extract to start the install::
+
+    cd /tmp
+    wget https://github.com/NagiosEnterprises/nrdp/archive/1.3.1.tar.gz
+    tar xvf 1.3.1.tar.ggz
+    cd nrdp-*
+
+Create a directory and move the NRDP files into place. You don't need to install most of the files outside of server, so we omit them from the cp command.:
 
     mkdir /usr/local/nrdp
-    
-2. Download and extract the latest nrdp release. Move the copied files out of the NRDP directory::
-
-    cd nrdp
-    cp -r * /usr/local/nrdp
-    
-3. Set permissions on NRDP dir/files::
-
+    cp -r clients server LICENSE* CHANGES* /usr/local/nrdp
     chown -R nagios:nagios /usr/local/nrdp
-    
-4. Edit the NRDP server config file::
+
+Edit the NRDP server config file and add your token to the `$cfg['authorized_tokens']` variable. See example in configuration if you don't know how to create one.:
 
     vi /usr/local/nrdp/server/config.inc.php
     
-And add at least one token string to the $cfg['authorized_tokens'] variable. Example::
-
-    $cfg['authorized_tokens'] = array(
-        "asd7fjk3l34",
-        "df23m7jadI34"
-    );
-    
-5. Configure Apache depending on the version and operating system you may need to change this location::
+Configure Apache depending on the curren Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6.:
 
     cp nrdp.conf /etc/httpd/conf.d
-    /etc/init.d/httpd restart
+    service httpd restart
 
-6. The NRDP server has now been installed! You can now try out the NRDP server API example by accessing::
+The NRDP server has now been installed.
+
+**Testing the Installation**
+
+You can now try out the NRDP server API example by accessing::
 
     http://<ip address>/nrdp
