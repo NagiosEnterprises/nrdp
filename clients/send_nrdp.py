@@ -111,7 +111,8 @@ class send_nrdp:
                     xml += "<output>"+cgi.escape(options.output,True)+"</output>"
                     xml += "</checkresult>"
                 xml += "</checkresults>"
-                self.post_data(options.url, options.token, xml)
+
+        self.post_data(options.url, options.token, xml)
 
 if __name__ == "__main__":
     send_nrdp().run()
