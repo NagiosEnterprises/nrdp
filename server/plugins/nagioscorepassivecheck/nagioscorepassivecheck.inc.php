@@ -12,6 +12,7 @@ require_once(dirname(__FILE__).'/../../includes/utils.inc.php');
 
 register_callback(CALLBACK_PROCESS_REQUEST,'nagioscorepassivecheck_process_request');
 
+
 function nagioscorepassivecheck_process_request($cbtype,$args){
 
 	$cmd=grab_array_var($args,"cmd");
@@ -74,7 +75,10 @@ function nagioscorepassivecheck_submit_check_data(){
 		handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
 		
 	$total_checks=0;
-		
+
+	// restrict permission to write only for owner only
+	umask(0577);
+
 	// process each result
 	foreach($xml->checkresult as $cr){
 	
@@ -103,7 +107,7 @@ function nagioscorepassivecheck_submit_check_data(){
 		
 		fprintf($fh,"### NRDP Check ###\n");
 		fprintf($fh,"start_time=%d.0\n",time());
-		fprintf($fh,"# Time: %s\n",date('r'));
+		fprintf($fh,"# Time: %s\n",@date('r'));
 		fprintf($fh,"host_name=%s\n",$hostname);
 		if($type=="service")
 			fprintf($fh,"service_description=%s\n",$servicename);
@@ -116,14 +120,16 @@ function nagioscorepassivecheck_submit_check_data(){
 		// close the file
 		fclose($fh);
 		
+		// create an ok-to-go, so Nagios Core picks it up
+		$fh=fopen($tmpname.".ok","w");
+		fclose($fh);
+
 		// change ownership and perms
 		chgrp($tmpname,$cfg["nagios_command_group"]);
-		chmod($tmpname,0770);
-		
-		// create an ok-to-go, so Nagios Core picks it up
-		$fh=fopen($tmpname.".ok","w+");
-		fclose($fh);
-		
+		chgrp($tmpname.".ok",$cfg["nagios_command_group"]);
+		chmod($tmpname,0660);
+		chmod($tmpname.".ok",0660);
+
 		$total_checks++;
 		}
 	
@@ -139,9 +145,7 @@ function nagioscorepassivecheck_submit_check_data(){
 	echo "</result>\n";
 	
 	exit();
-	}
+}
 
-
-	
 
 ?>

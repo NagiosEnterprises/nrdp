@@ -281,7 +281,7 @@ function parse_argv($argv)
  * Version : 1.00.A
  * License: BSD
  */
-function load_url($url,$options=array('method'=>'get','return_info'=>false))
+function load_url($url, $options = array('method' => 'get', 'return_info' => false))
 {
     // Added default timeout of 15 seconds
     if (!isset($options['timeout'])) {
@@ -289,12 +289,18 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false))
     }
 
     $url_parts = parse_url($url);
-    if ($url_parts['port'] != "") { $port=":" . $url_parts['port']; } else { $port=":80"; }
+    if (!empty($url_parts['port'])) {
+        $port = intval($url_parts['port']);
+    } else {
+        // Default to port 80
+        $port = 80;
+        if (isset($options['scheme']) && preg_match("#https#i", $url_parts['scheme']) == 1) {
+            $port = 443;
+        }
+    }
 
     // Currently only supported by curl
-    $info = array(
-        'http_code' => 200
-    );
+    $info = array('http_code' => 200);
     $response = '';
 
     $send_header = array(
@@ -308,12 +314,12 @@ function load_url($url,$options=array('method'=>'get','return_info'=>false))
     if (function_exists("curl_init") and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { 
 
         if (isset($options['method']) and $options['method'] == 'post') {
-            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . $port . $url_parts['path'];
+            $page = $url_parts['scheme'] . '://' . $url_parts['host'] . ':' . $port . $url_parts['path'];
         } else {
             $page = $url;
         }
 
-        $ch = curl_init($url_parts['host']);
+        $ch = curl_init();
 
         // Added a timeout
         if (isset($options['timeout'])) {

@@ -12,6 +12,7 @@ require_once(dirname(__FILE__).'/../../includes/utils.inc.php');
 
 register_callback(CALLBACK_PROCESS_REQUEST,'nagioscorecmd_process_request');
 
+
 function nagioscorecmd_process_request($cbtype,$args){
 
 	$cmd=grab_array_var($args,"cmd");
@@ -96,8 +97,7 @@ function nagioscorecmd_submit_nagios_command($raw=false){
 	echo "</result>\n";
 
 	exit();
-	}
+}
 
-	
 
 ?>
