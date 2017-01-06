@@ -2,7 +2,7 @@
 //
 // NRDP Config File
 //
-// Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
+// Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
 

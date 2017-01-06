@@ -2,7 +2,7 @@
 //
 // NRDP Utils
 //
-// Copyright (c) 2008-2016 - Nagios Enterprises, LLC. All rights reserved.
+// Copyright (c) 2008-2017 - Nagios Enterprises, LLC. All rights reserved.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
 

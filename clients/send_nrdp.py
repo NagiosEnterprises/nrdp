@@ -2,7 +2,7 @@
 #
 # send_nrdp.py
 #
-# Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
+# Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
 # Written by: Scott Wilkerson (nagios@nagios.org)
 #
 

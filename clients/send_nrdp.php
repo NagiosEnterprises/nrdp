@@ -3,7 +3,7 @@
 //
 // send_nrdp.php
 //
-// Copyright (c) 2010-2016 - Nagios Enterprises, LLC.
+// Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
 // Portions Copyright (c) others - see source code below.
 //
 // Software License:
