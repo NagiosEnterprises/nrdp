@@ -88,7 +88,7 @@ install -m 0755 -D -p clients/* %{buildroot}%{_bindir}/
 * Sat Nov 21 2015 Athmane Madjoudj <athmane@fedoraproject.org> 0.20150122gitbd1b5d0-2
 - Use better version (pre-release)
 - Include license file in the clients sub-pkg
-- Add a license workarround
+- Add a license workaround
 
 * Fri Nov 20 2015 Athmane Madjoudj <athmane@fedoraproject.org> 0.bd1b5d0git-1
 - Initial spec file.

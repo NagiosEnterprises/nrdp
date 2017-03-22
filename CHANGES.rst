@@ -1,6 +1,6 @@
 ﻿1.4.0 - 01/06/2017
 ------------------
-- Added option to callback funciton for prepending instead of appending to callback array (added by tmcnag) -JO
+- Added option to callback function for prepending instead of appending to callback array (added by tmcnag) -JO
 - Updated send_nrdp.sh to the latest revision -JO
 - Updated with code for injecting directly into NDO if sent past check results -JO
 - Fixed issue with send_nrdp.php not respecting ports (patched by ericloyd) -JO
