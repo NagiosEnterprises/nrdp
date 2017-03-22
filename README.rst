@@ -25,7 +25,7 @@ Edit the NRDP server config file and add your token to the `$cfg['authorized_tok
 
     vi /usr/local/nrdp/server/config.inc.php
     
-Configure Apache depending on the curren Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6::
+Configure Apache depending on the current Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6::
 
     cp nrdp.conf /etc/httpd/conf.d
     service httpd restart
