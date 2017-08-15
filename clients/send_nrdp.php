@@ -31,7 +31,8 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 //
-
+// 2017-08-15 Troy Lea aka BOX293
+//  - Updated load_url function to work with https
 
 doit();
 
@@ -294,7 +295,7 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
     } else {
         // Default to port 80
         $port = 80;
-        if (isset($options['scheme']) && preg_match("#https#i", $url_parts['scheme']) == 1) {
+        if (isset($url_parts['scheme']) && preg_match("#https#i", $url_parts['scheme']) == 1) {
             $port = 443;
         }
     }
