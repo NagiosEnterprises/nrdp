@@ -5,6 +5,14 @@
 # Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
 # Written by: Scott Wilkerson (nagios@nagios.org)
 #
+# 2017-09-22 Troy Lea aka BOX293
+#  - Fixed setup function that was not working for piped results
+#    as the xml string was missing "</checkresults>"
+#  - Fixed setup function that was not working with arguments when
+#    run as a cron job or if being used as a nagios command like
+#    obsessive compulsive ... "if not sys.stdin.isatty():" was the
+#    reason why.
+
 
 import optparse, sys, urllib, cgi
 from xml.dom.minidom  import parseString
@@ -52,7 +60,7 @@ class send_nrdp:
         return ''.join(rc)
 
     def post_data(self, url, token, xml):
-        params = urllib.urlencode({'token': token.strip(),'cmd': 'submitcheck', 'XMLDATA': xml});
+        params = urllib.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'XMLDATA': xml});
         opener = urllib.FancyURLopener()
         try:
             f = opener.open(url, params)
@@ -74,8 +82,8 @@ class send_nrdp:
             options.checktype = "1"
         xml="<?xml version='1.0'?>\n<checkresults>\n";
         
-        # It is possible this may not work on windows systems ...
-        if not sys.stdin.isatty():
+        # If only url and token have been provided then it is assumed that data is being piped
+        if not options.hostname and not options.state:
             for line in sys.stdin.readlines():
                 parts = line.split(options.delim)
                 if len(parts) == 4:
@@ -91,7 +99,8 @@ class send_nrdp:
                     xml += "<state>"+parts[1]+"</state>"
                     xml += "<output>"+cgi.escape(parts[2],True)+"</output>"
                     xml += "</checkresult>"
-                    
+                xml += "</checkresults>"
+        
         # TODO add file option
         #elif options.file:
         #    xml += READ THE FILE
