@@ -224,7 +224,7 @@ fi
 
  # If only url and token have been provided then it is assumed that data is being piped
 ########################
-if [[ ! $host && ! $State && ! $file ]]; then
+if [[ ! $host && ! $State && ! $file && ! $directory ]]; then
     xml=""
     # we know we are being piped results
     IFS=$delim

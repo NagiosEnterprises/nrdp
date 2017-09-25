@@ -32,6 +32,8 @@ class send_nrdp:
             dest="state", help="An integer indicating the current state of the host or service."),
         optparse.make_option('-o', '--output', action="store",
             dest="output", help="Text output to be sent as the passive check result. Newlines should be encoded with encoded newlines (\\n)."),
+        optparse.make_option('-f', '--file', action="store",
+            dest="file", help="-f /full/path/to/file\nThis file will be sent to the NRDP server specified in -u\nThe file should be an XML file in the following format\n##################################################\n<?xml version='1.0'?>\n<checkresults>\n  <checkresult type=\"host\" checktype=\"1\">\n    <hostname>YOUR_HOSTNAME</hostname>\n    <state>0</state>\n    <output>OK|perfdata=1.00;5;10;0</output>\n  </checkresult>\n  <checkresult type=\"service\" checktype=\"1\">\n    <hostname>YOUR_HOSTNAME</hostname>\n    <servicename>YOUR_SERVICENAME</servicename>\n    <state>0</state>\n    <output>OK|perfdata=1.00;5;10;0</output>\n  </checkresult>\n</checkresults>\n##################################################"),
         optparse.make_option('-d', '--delim', action="store",
             dest="delim", help="With only the required parameters send_nrdp.py is capable of processing data piped to it either from a file or other process. By default, we use t as the delimiter however this may be specified with the -d option data should be in the following formats one entry per line."),
         optparse.make_option('-c', '--checktype', action="store",
