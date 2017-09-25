@@ -5,9 +5,14 @@
 # Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
 # Written by: Scott Wilkerson (nagios@nagios.org)
 #
+# 2017-09-25 Troy Lea aka BOX293
+#  - Fixed script not working with arguments when run as a cron job
+#    or if being used as a nagios command like obsessive compulsive.
+#     ... "if [ ! -t 0 ]" was the reason why.
+
 
 PROGNAME=$(basename $0)
-RELEASE="Revision 0.5"
+RELEASE="Revision 0.6"
 
 print_release() {
     echo "$RELEASE"
@@ -217,9 +222,9 @@ if [ $host ]; then
     checkcount=1
 fi
 
-# Detect STDIN
+ # If only url and token have been provided then it is assumed that data is being piped
 ########################
-if [ ! -t 0 ]; then
+if [[ ! $host && ! $State ]]; then
     xml=""
     # we know we are being piped results
     IFS=$delim
