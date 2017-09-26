@@ -16,6 +16,9 @@
 #  - Added file argument to allow XML results to be read from file
 #  - Replaced optparse with argparse so help text can include newline
 #    characters, allowing for better formatting.
+# 2017-09-26 Troy Lea aka BOX293
+#  - Made sure url ends with a / before posting
+
 
 import argparse, sys, urllib, cgi
 from xml.dom.minidom import parseString
@@ -89,7 +92,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
             sys.exit()
         except Exception, e:
             sys.exit(e)
-
+        
     def getText(self, nodelist):
         rc = []
         for node in nodelist:
@@ -98,6 +101,10 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
         return ''.join(rc)
 
     def post_data(self, url, token, xml):
+        # Make sure URL ends with a /
+        if not url.endswith('/'):
+            url += '/'
+        
         params = urllib.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'XMLDATA': xml});
         opener = urllib.FancyURLopener()
         try:
