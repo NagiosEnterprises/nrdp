@@ -2,7 +2,7 @@
 //
 // Nagios Core Passive Check NRDP Plugin
 //
-// Copyright (c) 2010-2017 - Nagios Enterprises, LLC. All rights reserved.
+// Copyright (c) 2010-2016 - Nagios Enterprises, LLC. All rights reserved.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
 
@@ -36,7 +36,7 @@ function nagioscorepassivecheck_submit_check_data()
     global $cfg;
     global $request;
 
-    $debug = false;
+    $debug = true;
 
     if ($debug) {
         echo "REQUEST:<BR>";
@@ -44,32 +44,54 @@ function nagioscorepassivecheck_submit_check_data()
         echo "<BR>";
     }
 
-    // Check results are passed as XML data
-    $xmldata = grab_request_var("XMLDATA");
+    // Check results can be passed as XML data or JSON data
+    $xmldata = grab_request_var("XMLDATA");	
+    $jsondata = grab_request_var("JSONDATA");
     
     if ($debug) {
         echo "XMLDATA:<BR>";
         print_r($xmldata);
         echo "<BR>";
+        echo "JSONDATA:<BR>";
+        print_r($jsondata);
+        echo "<BR>";
     }
 
     // Make sure we have data
-    if (!have_value($xmldata)) {
+    if (!have_value($xmldata) & !have_value($jsondata)) {
         handle_api_error(ERROR_NO_DATA);
     }
 
     // Convert to xml
-    $xml = @simplexml_load_string($xmldata);
-    if (!$xml) {
-        print_r(libxml_get_errors());
-        handle_api_error(ERROR_BAD_XML);
-    }
-
-    if ($debug) {
-        echo "OUR XML:<BR>";
-        print_r($xml);
-        echo "<BR>";
-    }
+    if (have_value($xmldata)) {
+		$xml = @simplexml_load_string($xmldata);
+		if (!$xml) {
+			print_r(libxml_get_errors());
+			handle_api_error(ERROR_BAD_XML);
+		}
+		$method = 'xml';
+		if ($debug) {
+			echo "OUR XML:<BR>";
+			print_r($xml);
+			echo "<BR>";
+		}
+	}
+	
+	// Convert to json
+	if (have_value($jsondata)) {
+		$json = @json_decode($jsondata, true);
+		if (!$json) {
+			/////////////////////////////////////////////////Need some stuff here
+			print_r(libxml_get_errors());
+			handle_api_error(ERROR_BAD_XML);
+		}
+		$method = 'json';
+	    if ($debug) {
+			echo "OUR JSON:<BR>";
+			print_r($json);
+			echo "<BR>";
+		}
+	}
 
     // Make sure we can write to check results dir
     if (!isset($cfg["check_results_dir"])) {
@@ -82,50 +104,100 @@ function nagioscorepassivecheck_submit_check_data()
     $total_checks = 0;
 
     // Process each result
-    foreach ($xml->checkresult as $cr) {
+    if ($method == "xml") {
+		foreach ($xml->checkresult as $cr) {
 
-        // Get check result type
-        $type = "host";
-        foreach ($cr->attributes() as $var => $val) {
-            if ($var == "type") {
-                $type = strval($val);
-            }
-        }
+			// Get check result type
+			$type = "host";
+			foreach ($cr->attributes() as $var => $val) {
+				if ($var == "type") {
+					$type = strval($val);
+				}
+			}
 
-        // Common elements
-        $hostname = strval($cr->hostname);
-        $state = intval($cr->state);
-        $output = strval($cr->output);
-        $output = str_replace("\n", "\\n", $output);
+			// Common elements
+			$hostname = strval($cr->hostname);
+			$state = intval($cr->state);
+			$output = strval($cr->output);
+			$output = str_replace("\n", "\\n", $output);
 
-        // Service checks
-        $servicename = "";
-        if ($type == "service") {
-            $servicename = strval($cr->servicename);
-        }
+			// Service checks
+			$servicename = "";
+			if ($type == "service") {
+				$servicename = strval($cr->servicename);
+			}
 
-        if (isset($cr->time) && isset($cfg["allow_old_results"])) {
-            if ($cfg["allow_old_results"]) {
-                $time = intval($cr->time);
-                nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
-            }
-        } else {
-            nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
-        }
+			if (isset($cr->time) && isset($cfg["allow_old_results"])) {
+				if ($cfg["allow_old_results"]) {
+					$time = intval($cr->time);
+					nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
+				}
+			} else {
+				nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
+			}
 
-        $total_checks++;
-    }
-
-    output_api_header();
+			$total_checks++;
+		}
     
-    echo "<result>\n";
-    echo "  <status>0</status>\n";
-    echo "  <message>OK</message>\n";
-    echo "    <meta>\n";
-    echo "       <output>".$total_checks." checks processed.</output>\n";
-    echo "    </meta>\n";
-    echo "</result>\n";
+		output_api_header();
+		
+		echo "<result>\n";
+		echo "  <status>0</status>\n";
+		echo "  <message>OK</message>\n";
+		echo "    <meta>\n";
+		echo "       <output>".$total_checks." checks processed.</output>\n";
+		echo "    </meta>\n";
+		echo "</result>\n";
+
+	}
+	elseif ($method == "json") {
+		foreach ($json as $cr) {
+			
+			// Get check result type
+			$type = "host";
+			foreach ($cr["checkresult"] as $var => $val) {
+				if ($var == "type") {
+					$type = strval($val);
+				}
+			}
+			
+			// Common elements
+			$hostname = strval($cr["hostname"]);
+			$state = intval($cr["state"]);
+			$output = strval($cr["output"]);
+			$output = str_replace("\n", "\\n", $output);
+
+			// Service checks
+			$servicename = "";
+			if ($type == "service") {
+				$servicename = strval($cr["servicename"]);
+			}
+
+			if (isset($cr["time"]) && isset($cfg["allow_old_results"])) {
+				if ($cfg["allow_old_results"]) {
+					$time = intval($cr["time"]);
+					nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
+				}
+			} else {
+				nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
+			}
+
+			$total_checks++;
+		
+		}
+	////////////////this needs changing as it outputs XML
+	output_api_header();
     
+    echo "{\n";
+    echo "  \"result\" : {\n";
+    echo "    \"status\" : \"0\",\n";
+    echo "    \"message\" : \"OK\",\n";
+    echo "    \"output\" : \"".$total_checks." checks processed.\"\n";
+    echo "  }\n";
+    echo "}\n";
+    
+	}
+
     exit();
 }
 
