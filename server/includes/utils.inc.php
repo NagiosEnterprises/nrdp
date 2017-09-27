@@ -155,8 +155,12 @@ function output_api_header() {
             header("Content-type: text/html");
         }
     } else {
-        header("Content-type: text/xml");
-        echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		if (isset($request['XMLDATA'])) {
+			header("Content-type: text/xml");
+			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		} elseif (isset($request['JSONDATA'])) {
+			header("Content-Type: application/json");
+		}
     }
 }
 

@@ -185,7 +185,7 @@ function nagioscorepassivecheck_submit_check_data()
 			$total_checks++;
 		
 		}
-	////////////////this needs changing as it outputs XML
+	
 	output_api_header();
     
     echo "{\n";
