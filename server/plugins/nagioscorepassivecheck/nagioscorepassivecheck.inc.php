@@ -2,7 +2,7 @@
 //
 // Nagios Core Passive Check NRDP Plugin
 //
-// Copyright (c) 2010-2016 - Nagios Enterprises, LLC. All rights reserved.
+// Copyright (c) 2010-2017 - Nagios Enterprises, LLC. All rights reserved.
 // License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
 //
 
@@ -36,7 +36,7 @@ function nagioscorepassivecheck_submit_check_data()
     global $cfg;
     global $request;
 
-    $debug = true;
+    $debug = false;
 
     if ($debug) {
         echo "REQUEST:<BR>";
