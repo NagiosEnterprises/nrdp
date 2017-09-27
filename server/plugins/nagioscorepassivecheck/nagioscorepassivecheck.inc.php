@@ -36,7 +36,7 @@ function nagioscorepassivecheck_submit_check_data()
     global $cfg;
     global $request;
 
-    $debug = false;
+    $debug = true;
 
     if ($debug) {
         echo "REQUEST:<BR>";
@@ -151,7 +151,7 @@ function nagioscorepassivecheck_submit_check_data()
 
 	}
 	elseif ($method == "json") {
-		foreach ($json as $cr) {
+		foreach ($json["checkresults"] as $cr) {
 			
 			// Get check result type
 			$type = "host";
