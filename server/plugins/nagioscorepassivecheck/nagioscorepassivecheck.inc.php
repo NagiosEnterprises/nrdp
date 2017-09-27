@@ -36,7 +36,7 @@ function nagioscorepassivecheck_submit_check_data()
     global $cfg;
     global $request;
 
-    $debug = true;
+    $debug = false;
 
     if ($debug) {
         echo "REQUEST:<BR>";
