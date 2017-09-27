@@ -62,7 +62,7 @@ function nagioscorepassivecheck_submit_check_data()
         handle_api_error(ERROR_NO_DATA);
     }
 
-    // Convert to xml
+    // If XMLDATA convert to xml
     if (have_value($xmldata)) {
 		$xml = @simplexml_load_string($xmldata);
 		if (!$xml) {
@@ -77,13 +77,17 @@ function nagioscorepassivecheck_submit_check_data()
 		}
 	}
 	
-	// Convert to json
+	// If JSONDATA convert to array
 	if (have_value($jsondata)) {
 		$json = @json_decode($jsondata, true);
 		if (!$json) {
-			/////////////////////////////////////////////////Need some stuff here
-			print_r(libxml_get_errors());
-			handle_api_error(ERROR_BAD_XML);
+			if (version_compare(phpversion(), '5.5.0', '>=')) {
+				print_r(json_last_error_msg());
+			} else {
+				print_r(json_last_error());
+			}
+			echo "\n";
+			handle_api_error(ERROR_BAD_JSON);
 		}
 		$method = 'json';
 	    if ($debug) {
@@ -186,15 +190,19 @@ function nagioscorepassivecheck_submit_check_data()
 		
 		}
 	
-	output_api_header();
-    
-    echo "{\n";
-    echo "  \"result\" : {\n";
-    echo "    \"status\" : \"0\",\n";
-    echo "    \"message\" : \"OK\",\n";
-    echo "    \"output\" : \"".$total_checks." checks processed.\"\n";
-    echo "  }\n";
-    echo "}\n";
+		output_api_header();
+
+		if (isset($request['pretty'])) {
+			echo "{\n";
+			echo "  \"result\" : {\n";
+			echo "    \"status\" : \"0\",\n";
+			echo "    \"message\" : \"OK\",\n";
+			echo "    \"output\" : \"".$total_checks." checks processed.\"\n";
+			echo "  }\n";
+			echo "}\n";
+		} else {
+			echo "{ \"result\" : {  \"status\" : \"0\", \"message\" : \"OK\", \"output\" : \"".$total_checks." checks processed.\" } }\n";
+		}
     
 	}
 
