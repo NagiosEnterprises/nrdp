@@ -30,6 +30,13 @@ Configure Apache depending on the current Apache version and operating system. I
     cp nrdp.conf /etc/httpd/conf.d
     service httpd restart
 
+And on Ubuntu 16.0.4::
+
+    cp nrdp.conf /etc/apache2/sites-enabled/nrdp.conf
+    sed -i '/Order allow,deny/c\ #' /etc/apache2/sites-enabled/nrdp.conf
+    sed -i '/Allow from all/c\Require all granted' /etc/apache2/sites-enabled/nrdp.conf
+    /etc/init.d/apache2 restart
+
 The NRDP server has now been installed.
 
 **Testing the Installation**
