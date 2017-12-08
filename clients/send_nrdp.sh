@@ -9,10 +9,12 @@
 #  - Fixed script not working with arguments when run as a cron job
 #    or if being used as a nagios command like obsessive compulsive.
 #     ... "if [ ! -t 0 ]" was the reason why.
+# 2017-12-08 Jørgen van der Meulen (Conclusion Xforce)
+#  - Fixed typo in NRDP abbreviation
 
 
 PROGNAME=$(basename $0)
-RELEASE="Revision 0.6"
+RELEASE="Revision 0.6.1"
 
 print_release() {
     echo "$RELEASE"
@@ -20,7 +22,7 @@ print_release() {
 
 print_usage() {
     echo ""
-    echo "$PROGNAME $RELEASE - Send NRPD script for Nagios"
+    echo "$PROGNAME $RELEASE - Send NRDP script for Nagios"
     echo ""
     echo "Usage: send_nrdp.sh -u URL -t token [options]"
     echo ""
@@ -31,7 +33,7 @@ print_usage() {
 print_help() {
         print_usage
         echo ""
-        echo "This script is used to send NRPD data to a Nagios server"
+        echo "This script is used to send NRDP data to a Nagios server"
         echo ""
         echo "Required:"
         echo "    -u","    URL of NRDP server.  Usually http://<IP_ADDRESS>/nrdp/"
