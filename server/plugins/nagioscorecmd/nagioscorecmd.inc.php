@@ -16,6 +16,7 @@ register_callback(CALLBACK_PROCESS_REQUEST,'nagioscorecmd_process_request');
 function nagioscorecmd_process_request($cbtype, $args)
 {
     $cmd = grab_array_var($args, "cmd");
+    _debug("nagioscorecmd_process_request(cbtype = {$cbtype}, args[cmd] = {$cmd}");
 
     switch ($cmd)
     {
@@ -33,15 +34,19 @@ function nagioscorecmd_process_request($cbtype, $args)
         default:
             break;
     }
+
+    _debug("nagioscorecmd_process_request() had no registered callbacks, returning");
 }
 
 
 function nagioscorecmd_submit_nagios_command($raw=false)
 {
     global $cfg;
+    _debug("nagioscorecmd_submit_nagios_command(raw=" . ($raw ? 'TRUE' : 'FALSE'));
 
     // If commands are disallowed in the config...
     if ($cfg["disable_external_commands"] === true) {
+        _debug('cfg[disable_external_commands] == true, bailing');
         handle_api_error(ERROR_DISABLED_COMMAND);
         return;
     }
@@ -50,19 +55,27 @@ function nagioscorecmd_submit_nagios_command($raw=false)
 
     // Make sure we have a command
     if (!have_value($command)) {
+        _debug('we have no command, bailing');
         handle_api_error(ERROR_NO_COMMAND);
     }
 
     // Make sure we can write to external command file
-    if (!isset($cfg["command_file"]))
+    if (!isset($cfg["command_file"])) {
+        _debug('we have no cfg[command_file], bailing');
         handle_api_error(ERROR_NO_COMMAND_FILE);
-    if (!file_exists($cfg["command_file"]))
+    }
+    if (!file_exists($cfg["command_file"])) {
+        _debug("cfg[command_file] ({$cfg['command_file']}) doesn't exist, bailing");
         handle_api_error(ERROR_BAD_COMMAND_FILE);
-    if (!is_writeable($cfg["command_file"]))
+    }
+    if (!is_writeable($cfg["command_file"])) {
+        _debug("cfg[command_file] ({$cfg['command_file']}) isn't writable, bailing");
         handle_api_error(ERROR_COMMAND_FILE_OPEN_WRITE);
+    }
         
     // Open external command file
     if (($handle = @fopen($cfg["command_file"],"w+")) === false) {
+        _debug("couldn't open cfg[command_file] ({$cfg['command_file']}), bailing");
         handle_api_error(ERROR_COMMAND_FILE_OPEN);
     }
 
@@ -92,9 +105,11 @@ function nagioscorecmd_submit_nagios_command($raw=false)
     fclose($handle);
 
     if ($result === false) {
+        _debug("fwrite() result was false, bailing");
         handle_api_error(ERROR_BAD_WRITE);
     }
 
+    _debug("fwrite() was successful!");
     output_api_header();
 
     echo "<result>\n";

@@ -1,4 +1,8 @@
-﻿1.4.0 - 01/06/2017
+﻿1.4.1 -
+------------------
+- Added rudimentary debugging to nrdp plugins (#27) -BH
+
+1.4.0 - 01/06/2017
 ------------------
 - Added option to callback function for prepending instead of appending to callback array (added by tmcnag) -JO
 - Updated send_nrdp.sh to the latest revision -JO

@@ -16,6 +16,7 @@ register_callback(CALLBACK_PROCESS_REQUEST, 'nagioscorepassivecheck_process_requ
 function nagioscorepassivecheck_process_request($cbtype, $args)
 {
     $cmd = grab_array_var($args, "cmd");
+    _debug("nagioscorepassivecheck_process_request(cbtype = {$cbtype}, args[cmd] = {$cmd}");
 
     switch ($cmd) {
 
@@ -28,6 +29,8 @@ function nagioscorepassivecheck_process_request($cbtype, $args)
         default:
             break;
     }
+
+    _debug("nagioscorepassivecheck_process_request() had no registered callbacks, returning");
 }
 
 
@@ -43,6 +46,12 @@ function nagioscorepassivecheck_submit_check_data()
         print_r($request);
         echo "<BR>";
     }
+    foreach($request as $index => $req) {
+        if (is_array($req)) {
+            $req = print_r($req, true);
+        }
+        _debug("REQUEST: [{$index}] {$req}");
+    }
 
     // Check results are passed as XML data
     $xmldata = grab_request_var("XMLDATA");
@@ -55,13 +64,16 @@ function nagioscorepassivecheck_submit_check_data()
 
     // Make sure we have data
     if (!have_value($xmldata)) {
+        _debug("no xmldata, bailing");
         handle_api_error(ERROR_NO_DATA);
     }
 
     // Convert to xml
     $xml = @simplexml_load_string($xmldata);
     if (!$xml) {
-        print_r(libxml_get_errors());
+        $xmlerr = print_r(libxml_get_errors(), true);
+        _debug("conversion to xml failed: {$xmlerr}");
+        echo $xmlerr;        
         handle_api_error(ERROR_BAD_XML);
     }
 
@@ -70,12 +82,15 @@ function nagioscorepassivecheck_submit_check_data()
         print_r($xml);
         echo "<BR>";
     }
+    _debug("our xml: " . print_r($xml, true));
 
     // Make sure we can write to check results dir
     if (!isset($cfg["check_results_dir"])) {
+        _debug('we have no cfg[check_results_dir], bailing');
         handle_api_error(ERROR_NO_CHECK_RESULTS_DIR);
     }
     if (!file_exists($cfg["check_results_dir"])) {
+        _debug("cfg[check_results_dir] ({$cfg['check_results_dir']}) doesn't exist, bailing");
         handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
     }
 
@@ -116,6 +131,7 @@ function nagioscorepassivecheck_submit_check_data()
         $total_checks++;
     }
 
+    _debug('all nrdp checks have been written');
     output_api_header();
     
     echo "<result>\n";
@@ -133,6 +149,7 @@ function nagioscorepassivecheck_submit_check_data()
 // Write out the check result to Nagios Core
 function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type)
 {
+    _debug("nrdp_write_check_output_to_cmd(hostname={$hostname}, servicename={$servicename}, state={$state}, type={$type}, output={$output}");
     global $cfg;
 
     ////// WRITE THE CHECK RESULT //////
@@ -143,6 +160,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     // Check if the file is in the check_results_dir
     if (strpos($tmpname, $cfg["check_results_dir"]) === false) {
         unlink($tmpname);
+        _debug("tmpname({$tmpname}) not in cfg[check_results_dir] ({$cfg['check_results_dir']}), bailing");
         handle_api_error(ERROR_BAD_CHECK_RESULTS_DIR);
     }
 
@@ -171,6 +189,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     // Create an ok-to-go, so Nagios Core picks it up
     $fh = fopen($tmpname.".ok", "w+");
     fclose($fh);
+    _debug("nrdp_write_check_output_to_cmd() successful");
 }
 
 
@@ -178,6 +197,8 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
 // so that we can input old (past checks) data into the database
 function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time)
 {
+    _debug("nrdp_write_check_output_to_ndo(hostname={$hostname}, servicename={$servicename}, state={$state}, type={$type}, output={$output}");
+
     // Connect to the NDOutils database with Nagios XI config options
     require("/usr/local/nagiosxi/html/config.inc.php");
     $ndodb = $cfg['db_info']['ndoutils'];
@@ -187,6 +208,7 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
 
     $db = new MySQLi($ndodb['dbserver'], $ndodb['user'], $ndodb['pwd'], $ndodb['db']);
     if ($db->connect_errno) {
+        _debug("Coudln't connect to database, bailing");
         return false;
     }
 
@@ -488,6 +510,7 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
     }
 
     $db->close();
+    _debug("nrdp_write_check_output_to_ndo() successful");
     return;
 }
 

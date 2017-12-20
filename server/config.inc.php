@@ -45,6 +45,12 @@ $cfg["disable_external_commands"] = false;
 // Allows Nagios XI to send old check results directly into NDO if configured
 $cfg["allow_old_results"] = false;
 
+// Enable debug logging
+$cfg["debug"] = false;
+
+// Where should the logs go?
+$cfg["debug_log"] = "/usr/local/nrdp/server/debug.log";
+
 
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 

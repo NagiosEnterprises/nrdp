@@ -340,3 +340,32 @@ if (!function_exists('register_callback')) {
         }
     }
 }
+
+if (!function_exists('_debug')) {
+    function _debug($data) {
+
+        global $cfg;
+
+        if (!is_string($data))
+            return;
+
+        $debug = grab_array_var($cfg, "debug", false);
+        if (!$debug)
+            return;
+
+        $file = grab_array_var($cfg, "debug_file", "/usr/local/nrdp/server/debug.log");
+        $date = '[' . date('r') . '] ';
+        $datepad = str_pad(' ', strlen($date));
+
+        $lines = explode("\n", $data);
+
+        foreach ($lines as $i => $line) {
+            if ($i == 0) {
+                file_put_contents($file, "{$date}{$line}\n", FILE_APPEND);
+            }
+            else {
+                file_put_contents($file, "{$datepad}{$line}\n", FILE_APPEND);
+            }
+        }
+    }
+}
