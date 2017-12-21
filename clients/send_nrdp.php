@@ -88,7 +88,7 @@ function doit()
     // Use read from stdin
     if ($usestdin != "") {
         while ($buf = rtrim(fgets(STDIN), "\n")) {
-            $parts = explode("\t", $buf);
+            $parts = explode($delim, $buf);
             $fields = count($parts);
 
             // Host check
@@ -181,7 +181,7 @@ function doit()
 function check_args($args)
 {
     global $argv;
-    global $url, $token, $host, $service, $state, $output, $type, $checktype, $usestdin;
+    global $url, $token, $host, $service, $state, $output, $type, $checktype, $usestdin, $delim;
 
     $error = false;
 
@@ -194,6 +194,7 @@ function check_args($args)
     $state = grab_array_var($args, "state");
     $output = html_entity_decode(grab_array_var($args, "output"), ENT_QUOTES);
     $usestdin = grab_array_var($args, "usestdin");
+    $delim = grab_array_var($args, "delim", "\t");
 
     if ($service != "") {
         $type = "service";
@@ -210,7 +211,7 @@ function check_args($args)
         echo "Portions Copyright (c) others - see source code\n";
         echo "License: BSD\n";
         echo "\n";
-        echo "Usage: ".$argv[0]." --url=<url> --token=<token> --host=<hostname> [--service=<servicename>] --state=<state> --output=<output>\n";
+        echo "Usage: ".$argv[0]." --url=<url> --token=<token> --host=<hostname> [--service=<servicename>] --state=<state> --output=<output> [--usestdin] [--delim=\\t]\n";
         echo "\n";
         echo "   <url>         = The URL used to access the remote NRDP agent.\n";
         echo "   <token>       = The secret token used to access the remote NRDP agent.\n";
@@ -218,6 +219,12 @@ function check_args($args)
         echo "   <servicename> = For service checks, the name of the service associated with the passive check result.\n";
         echo "   <state>       = An integer indicating the current state of the host or service.\n";
         echo "   <output>      = Text output to be sent as the passive check result. Newlines should be encoded with encoded newlines (\\n).\n";
+        echo "   <usestdin>    = Accept check result data from STDIN instead of --host,--service,--state,--output flags\n";
+        echo "                   Each line contains a check result in the format of:\n";
+        echo "                   host[DELIM]state[DELIM]output[DELIM]\n";
+        echo "                   or\n";
+        echo "                   host[DELIM]service[DELIM]state[DELIM]output[DELIM]\n";
+        echo "   <delim>       = The delimeter (DELIM above) to use when processing from STDIN. The default is \\t (TAB)\n";
         echo "\n";
         echo "Send a passive host or service check result to a remote Nagios instance using the NRDP agent.\n";
         exit(1);
