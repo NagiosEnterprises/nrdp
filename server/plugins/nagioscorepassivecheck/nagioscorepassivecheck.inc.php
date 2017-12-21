@@ -39,13 +39,6 @@ function nagioscorepassivecheck_submit_check_data()
     global $cfg;
     global $request;
 
-    $debug = false;
-
-    if ($debug) {
-        echo "REQUEST:<BR>";
-        print_r($request);
-        echo "<BR>";
-    }
     foreach($request as $index => $req) {
         if (is_array($req)) {
             $req = print_r($req, true);
@@ -53,36 +46,52 @@ function nagioscorepassivecheck_submit_check_data()
         _debug("REQUEST: [{$index}] {$req}");
     }
 
-    // Check results are passed as XML data
-    $xmldata = grab_request_var("XMLDATA");
+    // Check results can be passed as XML data or JSON data
+    $xmldata = grab_request_var("XMLDATA");	
+    $jsondata = grab_request_var("JSONDATA");
     
-    if ($debug) {
-        echo "XMLDATA:<BR>";
-        print_r($xmldata);
-        echo "<BR>";
-    }
-
     // Make sure we have data
-    if (!have_value($xmldata)) {
-        _debug("no xmldata, bailing");
+    if (!have_value($xmldata) & !have_value($jsondata)) {
+        _debug("no xmldata or jsondata, bailing");
         handle_api_error(ERROR_NO_DATA);
     }
 
     // Convert to xml
-    $xml = @simplexml_load_string($xmldata);
-    if (!$xml) {
-        $xmlerr = print_r(libxml_get_errors(), true);
-        _debug("conversion to xml failed: {$xmlerr}");
-        echo $xmlerr;        
-        handle_api_error(ERROR_BAD_XML);
+    if (have_value($xmldata)) {
+
+        _debug('have xml');
+        $xml = @simplexml_load_string($xmldata);
+
+        if (!$xml) {
+            $xmlerr = print_r(libxml_get_errors(), true);
+            _debug("conversion to xml failed: {$xmlerr}");
+            echo $xmlerr;        
+            handle_api_error(ERROR_BAD_XML);
+        }
+
+        $method = 'xml';
+        _debug("our xml: " . print_r($xml, true));
     }
 
-    if ($debug) {
-        echo "OUR XML:<BR>";
-        print_r($xml);
-        echo "<BR>";
+    else if (have_value($jsondata)) {
+
+        _debug('have json');
+        $json = @json_decode($jsondata, true);
+
+        if (!$json) {
+            if (version_compare(phpversion(), '5.5.0', '>=')) {
+                $jsonerr = print_r(json_last_error_msg(), true);
+            } else {
+                $jsonerr = print_r(json_last_error(), true);
+            }
+            _debug("conversion to json failed: {$jsonerr}");
+            handle_api_error(ERROR_BAD_JSON);
+        }
+
+        $method = 'json';
+        _debug("our json: " . print_r($json, true));
     }
-    _debug("our xml: " . print_r($xml, true));
+
 
     // Make sure we can write to check results dir
     if (!isset($cfg["check_results_dir"])) {
@@ -97,51 +106,105 @@ function nagioscorepassivecheck_submit_check_data()
     $total_checks = 0;
 
     // Process each result
-    foreach ($xml->checkresult as $cr) {
+    if ($method == "xml") {
+		foreach ($xml->checkresult as $cr) {
 
-        // Get check result type
-        $type = "host";
-        foreach ($cr->attributes() as $var => $val) {
-            if ($var == "type") {
-                $type = strval($val);
-            }
-        }
+			// Get check result type
+			$type = "host";
+			foreach ($cr->attributes() as $var => $val) {
+				if ($var == "type") {
+					$type = strval($val);
+				}
+			}
 
-        // Common elements
-        $hostname = strval($cr->hostname);
-        $state = intval($cr->state);
-        $output = strval($cr->output);
-        $output = str_replace("\n", "\\n", $output);
+			// Common elements
+			$hostname = strval($cr->hostname);
+			$state = intval($cr->state);
+			$output = strval($cr->output);
+			$output = str_replace("\n", "\\n", $output);
 
-        // Service checks
-        $servicename = "";
-        if ($type == "service") {
-            $servicename = strval($cr->servicename);
-        }
+			// Service checks
+			$servicename = "";
+			if ($type == "service") {
+				$servicename = strval($cr->servicename);
+			}
 
-        if (isset($cr->time) && isset($cfg["allow_old_results"])) {
-            if ($cfg["allow_old_results"]) {
-                $time = intval($cr->time);
-                nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
-            }
-        } else {
-            nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
-        }
+			if (isset($cr->time) && isset($cfg["allow_old_results"])) {
+				if ($cfg["allow_old_results"]) {
+					$time = intval($cr->time);
+					nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
+				}
+			} else {
+				nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
+			}
 
-        $total_checks++;
-    }
-
-    _debug('all nrdp checks have been written');
-    output_api_header();
+			$total_checks++;
+		}
     
-    echo "<result>\n";
-    echo "  <status>0</status>\n";
-    echo "  <message>OK</message>\n";
-    echo "    <meta>\n";
-    echo "       <output>".$total_checks." checks processed.</output>\n";
-    echo "    </meta>\n";
-    echo "</result>\n";
-    
+        _debug("all nrdp (xml) checks have been written");
+		output_api_header();
+		
+		echo "<result>\n";
+		echo "  <status>0</status>\n";
+		echo "  <message>OK</message>\n";
+		echo "    <meta>\n";
+		echo "       <output>".$total_checks." checks processed.</output>\n";
+		echo "    </meta>\n";
+		echo "</result>\n";
+
+	}
+	else if ($method == "json") {
+		foreach ($json["checkresults"] as $cr) {
+			
+			// Get check result type
+			$type = "host";
+			foreach ($cr["checkresult"] as $var => $val) {
+				if ($var == "type") {
+					$type = strval($val);
+				}
+			}
+			
+			// Common elements
+			$hostname = strval($cr["hostname"]);
+			$state = intval($cr["state"]);
+			$output = strval($cr["output"]);
+			$output = str_replace("\n", "\\n", $output);
+
+			// Service checks
+			$servicename = "";
+			if ($type == "service") {
+				$servicename = strval($cr["servicename"]);
+			}
+
+			if (isset($cr["time"]) && isset($cfg["allow_old_results"])) {
+				if ($cfg["allow_old_results"]) {
+					$time = intval($cr["time"]);
+					nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
+				}
+			} else {
+				nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output, $type);
+			}
+
+			$total_checks++;
+		
+		}
+	
+        _debug("all nrdp (json) checks have been written");
+		output_api_header();
+
+		if (isset($request['pretty'])) {
+			echo "{\n";
+			echo "  \"result\" : {\n";
+			echo "    \"status\" : \"0\",\n";
+			echo "    \"message\" : \"OK\",\n";
+			echo "    \"output\" : \"".$total_checks." checks processed.\"\n";
+			echo "  }\n";
+			echo "}\n";
+		} else {
+			echo "{ \"result\" : {  \"status\" : \"0\", \"message\" : \"OK\", \"output\" : \"".$total_checks." checks processed.\" } }\n";
+		}
+	}
+
     exit();
 }
 
@@ -197,7 +260,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
 // so that we can input old (past checks) data into the database
 function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time)
 {
-    _debug("nrdp_write_check_output_to_ndo(hostname={$hostname}, servicename={$servicename}, state={$state}, type={$type}, output={$output}");
+    _debug("nrdp_write_check_output_to_ndo(hostname={$hostname}, servicename={$servicename}, state={$state}, type={$type}, time={$time}, output={$output}");
 
     // Connect to the NDOutils database with Nagios XI config options
     require("/usr/local/nagiosxi/html/config.inc.php");
