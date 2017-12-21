@@ -4,6 +4,7 @@
 - Added ability to receive JSON check results (#23) -Box293 (Troy)
 - Added documentation for --usestdin and --delim (#17) -BH
 - Added ability to specify a delimiter when using stdin (#17) -BH
+- Fixed submission of check results when check result dir is in (or is) a symlink (#25) -BH
 
 1.4.0 - 01/06/2017
 ------------------
