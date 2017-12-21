@@ -1,6 +1,7 @@
-﻿1.4.1 -
+﻿1.5.0 -
 ------------------
 - Added rudimentary debugging to nrdp plugins (#27) -BH
+- Added ability to receive JSON check results (#23) -Box293 (Troy)
 
 1.4.0 - 01/06/2017
 ------------------
