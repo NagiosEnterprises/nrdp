@@ -13,6 +13,21 @@ $cfg['authorized_tokens'] = array(
     //"mysecrettoken",  // <-- not a good token
     //"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
 );
+
+// By default, all authorized tokens are allowed to submit any
+// external command (unless it's disable below)
+// This is a deny mapping in the form of COMMAND => TOKEN or TOKENS
+// You can specify a whole command, or use * as a wildcard
+// Or you can specify 'all' to stop any token from using any external command
+// the tokens specified can either be a string with 1 token, or an array of 1 or more tokens
+$cfg['external_commands_deny_tokens'] = array(
+//    "ACKNOWLEDGE_HOST_PROBLEM" => array("mysecrettoken", "myothertoken"),
+//    "ACKNOWLEDGE_SVC_PROBLEM" => "mysecrettoken",
+//    "all" => array("mysecrettoken", "myothertoken"),
+//    "ACKNOWLEDGE_*" => "mysecrettoken",
+//    "*_HOST_*" => array("mysecrettoken", "myothertoken"),
+);
+
     
 // Do we require that HTTPS be used to access NRDP?
 // set this value to 'false' to disable HTTPS requirement
