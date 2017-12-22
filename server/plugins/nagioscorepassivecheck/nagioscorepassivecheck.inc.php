@@ -248,7 +248,10 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     
     // Change ownership and perms
     $command_group = grab_array_var($cfg, "nagios_command_group", "nagcmd");
-    if (posix_getgrnam($command_group) !== false) {
+    // chgrp if the function we want doesn't exist
+    // or if it does exist and doesn't return false
+    if (!function_exists("posix_getgrnam") 
+        || posix_getgrnam($command_group) !== false) {
         chgrp($tmpname, $command_group);
     } else {
         _debug("nagios_command_group={$command_group} does not exist, not chgrp()ing");
