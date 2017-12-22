@@ -247,7 +247,10 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     fclose($fh);
     
     // Change ownership and perms
-    chgrp($tmpname, $cfg["nagios_command_group"]);
+    $command_group = grab_array_var($cfg, "nagios_command_group", "nagcmd");
+    if (posix_getgrnam($command_group) !== false) {
+        chgrp($tmpname, $cfg["nagios_command_group"]);
+    }
     chmod($tmpname, 0770);
     
     // Create an ok-to-go, so Nagios Core picks it up
