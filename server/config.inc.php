@@ -70,7 +70,7 @@ $cfg["debug_log"] = "/usr/local/nrdp/server/debug.log";
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 
 $cfg['product_name'] = 'nrdp';
-$cfg['product_version'] = '1.4.0'
+$cfg['product_version'] = '1.5.0'
 
 
 ?>

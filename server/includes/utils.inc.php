@@ -155,7 +155,7 @@ function output_api_header() {
             header("Content-type: text/html");
         }
     } else {
-		if (isset($request['JSONDATA'])) {
+		if (isset($request['JSONDATA']) || isset($request['json'])) {
 			header("Content-Type: application/json");
 		} else {
 			header("Content-type: text/xml");
