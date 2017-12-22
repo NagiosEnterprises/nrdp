@@ -1,10 +1,14 @@
-﻿1.5.0 -
+﻿1.5.0 - 12/22/2017
 ------------------
 - Added rudimentary debugging to nrdp plugins (#27) -BH
 - Added ability to receive JSON check results (#23) -Box293 (Troy)
 - Added documentation for --usestdin and --delim (#17) -BH
 - Added ability to specify a delimiter when using stdin (#17) -BH
 - Added granular command denial mechanism for executing external commands (#25) -BH
+- Added a little bit of bootstrap and jQuery to make the NRDP experience a bit nicer -BH
+- Changed to AJAX based submission -BH
+- Added usable page hashes (/nrdp/#json, /nrdp/#xml, /nrdp/#command) -BH
+- Added easier way to customize your page defaults (in index.php variables) -BH
 - Fixed submission of check results when check result dir is in (or is) a symlink (#13) -BH
 
 1.4.0 - 01/06/2017
