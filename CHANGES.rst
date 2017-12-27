@@ -1,4 +1,4 @@
-1.5.1 - 
+1.5.1 - 12/27/2017
 ------------------
 - Fixed an issue where posix_getgrnam() isn't found (#28) -BH
 
