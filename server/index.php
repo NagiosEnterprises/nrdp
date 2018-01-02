@@ -159,19 +159,23 @@ function display_form()
 	$jsondata = "{\n" .
 		"    \"checkresults\": [\n" .
 		"        {\n" .
-		"            \"host\": {\n" .
-		"                \"hostname\": \"somehost\",\n" .
-		"                \"state\": 0,\n" .
-		"                \"output\": \"Everything looks okay! | perfdata=1;\"\n" .
-		"            }\n" .
+		"            \"checkresult\": {\n" .
+		"                \"type\": \"host\",\n" .
+		"                \"checktype\": \"1\"\n" .
+		"            },\n" .
+		"            \"hostname\": \"somehost\",\n" .
+		"            \"state\": \"0\",\n" .
+		"            \"output\": \"Everything looks okay! | perfdata=1;\"\n" .
 		"        },\n" .
 		"        {\n" .
-		"            \"service\": {\n" .
-		"                \"hostname\": \"somehost\",\n" .
-		"                \"servicename\": \"someservice\",\n" .
-		"                \"state\": 1,\n" .
-		"                \"output\": \"WARNING: Danger Will Robinson! | perfdata=1;\"\n" .
-		"            }\n" .
+		"            \"checkresult\": {\n" .
+		"                \"type\": \"service\",\n" .
+		"                \"checktype\": \"1\"\n" .
+		"            },\n" .
+		"            \"hostname\": \"somehost\",\n" .
+		"            \"servicename\": \"someservice\",\n" .
+		"            \"state\": \"1\",\n" .
+		"            \"output\": \"WARNING: Danger Will Robinson! | perfdata=1;\"\n" .
 		"        }\n" .
 		"    ]\n" .
 		"}";
@@ -420,7 +424,7 @@ function display_form()
 							<div class="tab-pane fade" id="json" role="tabpanel" aria-labelledby="json-tab">
 
 								<div class="form-group">
-									<textarea rows="19" name="JSONDATA" id="jsondata" class="form-control form-control-sm"><?php echo $jsondata; ?></textarea>
+									<textarea rows="23" name="JSONDATA" id="jsondata" class="form-control form-control-sm"><?php echo $jsondata; ?></textarea>
 									<small class="form-text">
 										Check result data in JSON format.
 									</small>
