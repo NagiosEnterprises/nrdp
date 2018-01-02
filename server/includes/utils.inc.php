@@ -155,8 +155,12 @@ function output_api_header() {
             header("Content-type: text/html");
         }
     } else {
-        header("Content-type: text/xml");
-        echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		if (isset($request['JSONDATA']) || isset($request['json'])) {
+			header("Content-Type: application/json");
+		} else {
+			header("Content-type: text/xml");
+			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		}
     }
 }
 
@@ -211,13 +215,27 @@ function xmlentities($uncleaned) {
 ////////////////////////////////////////////////////////////////////////
 
 
-// Just returns an XML error string and exits execution
+// Just returns an XML or JSON error string and exits execution
 function handle_api_error($msg) {
+	global $request;
     output_api_header();
-    echo "<result>\n";
-    echo "  <status>-1</status>\n";
-    echo "  <message>" . xmlentities($msg) . "</message>\n";
-    echo "</result>\n";
+    if (isset($request['JSONDATA'])) {
+		if (isset($request['pretty'])) {
+			echo "{\n";
+			echo "  \"result\" : {\n";
+			echo "    \"status\" : \"0\",\n";
+			echo "    \"message\" : \"".$msg."\"\n";
+			echo "  }\n";
+			echo "}\n";
+		} else {
+			echo "{ \"result\" : { \"status\" : \"-1\", \"message\" : \"".$msg."\" } }\n";
+		}
+	} else {
+		echo "<result>\n";
+		echo "  <status>-1</status>\n";
+		echo "  <message>" . xmlentities($msg) . "</message>\n";
+		echo "</result>\n";
+	}
     exit();
 }
 
@@ -337,6 +355,35 @@ if (!function_exists('register_callback')) {
             array_unshift($callbacks[$cbtype], $func);
         } else {
             $callbacks[$cbtype][] = $func;
+        }
+    }
+}
+
+if (!function_exists('_debug')) {
+    function _debug($data) {
+
+        global $cfg;
+
+        if (!is_string($data))
+            return;
+
+        $debug = grab_array_var($cfg, "debug", false);
+        if (!$debug)
+            return;
+
+        $file = grab_array_var($cfg, "debug_file", "/usr/local/nrdp/server/debug.log");
+        $date = '[' . date('r') . '] ';
+        $datepad = str_pad(' ', strlen($date));
+
+        $lines = explode("\n", $data);
+
+        foreach ($lines as $i => $line) {
+            if ($i == 0) {
+                file_put_contents($file, "{$date}{$line}\n", FILE_APPEND);
+            }
+            else {
+                file_put_contents($file, "{$datepad}{$line}\n", FILE_APPEND);
+            }
         }
     }
 }

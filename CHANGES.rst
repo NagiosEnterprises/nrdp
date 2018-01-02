@@ -1,4 +1,21 @@
-﻿1.4.0 - 01/06/2017
+1.5.1 - 12/27/2017
+------------------
+- Fixed an issue where posix_getgrnam() isn't found (#28) -BH
+
+1.5.0 - 12/22/2017
+------------------
+- Added rudimentary debugging to nrdp plugins (#27) -BH
+- Added ability to receive JSON check results (#23) -Box293 (Troy)
+- Added documentation for --usestdin and --delim (#17) -BH
+- Added ability to specify a delimiter when using stdin (#17) -BH
+- Added granular command denial mechanism for executing external commands (#25) -BH
+- Added a little bit of bootstrap and jQuery to make the NRDP experience a bit nicer -BH
+- Changed to AJAX based submission -BH
+- Added usable page hashes (/nrdp/#json, /nrdp/#xml, /nrdp/#command) -BH
+- Added easier way to customize your page defaults (in index.php variables) -BH
+- Fixed submission of check results when check result dir is in (or is) a symlink (#13) -BH
+
+1.4.0 - 01/06/2017
 ------------------
 - Added option to callback function for prepending instead of appending to callback array (added by tmcnag) -JO
 - Updated send_nrdp.sh to the latest revision -JO
