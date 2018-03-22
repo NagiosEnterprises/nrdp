@@ -218,6 +218,7 @@ function xmlentities($uncleaned) {
 // Just returns an XML or JSON error string and exits execution
 function handle_api_error($msg) {
 	global $request;
+    _debug("handle_api_error(msg=$msg)");
     output_api_header();
     if (isset($request['JSONDATA'])) {
 		if (isset($request['pretty'])) {
@@ -248,20 +249,27 @@ function handle_api_error($msg) {
 function check_auth() {
     global $cfg;
 
+    _debug("check_auth()");
+
     // HTTPS is required
     if (!isset($cfg["require_https"]) || $cfg["require_https"] !== false) {
+        _debug(" * require_https either not set or non-false (is required)");
         if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "") {
+            _debug(" * no https usage, denying auth");
             handle_api_error(ERROR_HTTPS_REQUIRED);
         }
     }
 
     // Require basic authentication
     if (!isset($cfg["require_basic_auth"]) || $cfg["require_basic_auth"]!==false){
+        _debug(" * require_basic_auth either not set or non-false (is required)");
         if (!isset($_SERVER['REMOTE_USER']) || $_SERVER['REMOTE_USER'] == "") {
+            _debug(" * no remote_user set, denying auth");
             handle_api_error(ERROR_NOT_AUTHENTICATED);
         }
         if (isset($cfg["valid_basic_auth_users"])) {
             if (!in_array($_SERVER['REMOTE_USER'], $cfg["valid_basic_auth_users"])) {
+                _debug(" * remote_user not in \$cfg['valid_basic_auth_users'], denying auth");
                 handle_api_error(ERROR_BAD_USER);
             }
         }
@@ -272,21 +280,30 @@ function check_auth() {
 function check_token() {
     global $cfg;
 
+    _debug("check_token()");
+
     // User must supply a token
     $user_token = grab_request_var("token");
     if (!have_value($user_token)) {
+        _debug(" * no token supplied");
         handle_api_error(ERROR_NO_TOKEN_SUPPLIED);
     }
 
+    _debug(" checking token: $user_token");
+
     // No valid tokens are configured
     if (!isset($cfg["authorized_tokens"])) {
+        _debug(" * no authorized_tokens defined in \$cfg, denying token");
         handle_api_error(ERROR_NO_TOKENS_DEFINED);
     }
 
     // Token must be valid
     if (!in_array($user_token, $cfg["authorized_tokens"])) {
+        _debug(" * token ($user_token) not in \$cfg['authorized_tokens'], denying token");
         handle_api_error(ERROR_BAD_TOKEN_SUPPLIED);
     }
+
+    _debug(" * token passed");
 }
     
     

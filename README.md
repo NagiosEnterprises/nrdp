@@ -11,8 +11,8 @@ Installation
 Download the latest tarball and extract to start the install::
 
     cd /tmp
-    wget https://github.com/NagiosEnterprises/nrdp/archive/1.4.0.tar.gz
-    tar xvf 1.4.0.tar.ggz
+    wget https://github.com/NagiosEnterprises/nrdp/archive/1.5.2.tar.gz
+    tar xvf 1.5.2.tar.ggz
     cd nrdp-*
 
 Create a directory and move the NRDP files into place. You don't need to install most of the files outside of server, so we omit them from the cp command::
@@ -39,7 +39,8 @@ And on Ubuntu 16.0.4::
 
 The NRDP server has now been installed.
 
-**Testing the Installation**
+Testing the Installation
+------------------------
 
 You can now try out the NRDP server API example by accessing::
 

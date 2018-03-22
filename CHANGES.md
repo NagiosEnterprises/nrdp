@@ -1,3 +1,9 @@
+1.5.2 - 03/22/2018
+------------------
+- Set executable bits on send_nrdp.php and send_nrdp.sh (#29) -tjyang
+- Added debugging to check_token() and check_auth() even in failure cases -BH
+- Moved rst files to md files for project consistency -BH
+
 1.5.1 - 12/27/2017
 ------------------
 - Fixed an issue where posix_getgrnam() isn't found (#28) -BH
