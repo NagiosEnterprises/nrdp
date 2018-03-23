@@ -3,6 +3,7 @@
 - Set executable bits on send_nrdp.php and send_nrdp.sh (#29) -tjyang
 - Added debugging to check_token() and check_auth() even in failure cases -BH
 - Moved rst files to md files for project consistency -BH
+- Updated README -Box293
 
 1.5.1 - 12/27/2017
 ------------------
