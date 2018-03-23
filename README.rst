@@ -8,7 +8,8 @@ By default, NRDP has the capability of allowing remote agents, applications, and
 Installation
 ============
 
-The KB article [Installing NRDP From Source](https://support.nagios.com/kb/article.php?id=602) has more detailed instuctions that apply to many operating systems.
+The KB article "Installing NRDP From Source" has more detailed instuctions that apply to many operating systems:
+https://support.nagios.com/kb/article.php?id=602
 
 Download the latest tarball and extract to start the install::
 
@@ -61,7 +62,8 @@ Client Scripts
 ------------------------
 
 The client scripts that are distributed with NRDP in the `clients` folder are clearly documented. They are basically a wrapper script for submitting a http post request.
-More detailed usage examples can be found in the [send_nrdp Client](https://support.nagios.com/kb/article.php?id=599) KB article.
+More detailed usage examples can be found in the "send_nrdp Client" KB article:
+https://support.nagios.com/kb/article.php?id=599
 
 Here is a service example with a WARNING state:::
 
