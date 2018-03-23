@@ -24,7 +24,7 @@ Create a directory and move the NRDP files into place. You don't need to install
     cp -r clients server LICENSE* CHANGES* /usr/local/nrdp
     chown -R nagios:nagios /usr/local/nrdp
 
-Edit the NRDP server config file and add your token to the `$cfg['authorized_tokens']` variable. See example in configuration if you don't know how to create one::
+Edit the NRDP server config file and add your token to the ``$cfg['authorized_tokens']`` variable. See example in configuration if you don't know how to create one::
 
     vi /usr/local/nrdp/server/config.inc.php
     
@@ -61,7 +61,7 @@ There are several ways to use NRDP:
 Client Scripts
 ------------------------
 
-The client scripts that are distributed with NRDP in the `clients` folder are clearly documented. They are basically a wrapper script for submitting a http post request.
+The client scripts that are distributed with NRDP in the ``clients`` folder are clearly documented. They are basically a wrapper script for submitting a http post request.
 More detailed usage examples can be found in the "send_nrdp Client" KB article:
 https://support.nagios.com/kb/article.php?id=599
 
@@ -80,8 +80,8 @@ You don't need to use the client script to submit check results, they can be sub
 Both XML and JSON formats are is supported.
 The request data is sent using the following http post request arguments:
 
-* `cmd=submitcheck`
-* `XMLDATA=XXXXX` OR `JSONDATA=XXXXX`
+* ``cmd=submitcheck``
+* ``XMLDATA=XXXXX`` OR ``JSONDATA=XXXXX``
 
 **XML Format**
 
@@ -111,9 +111,9 @@ Service::
     </checkresults>
 
 
-Multipe check results can be posted using additional `<checkresult type='host/service'>XXXXX</checkresult>`.
+Multipe check results can be posted using additional ``<checkresult type='host/service'>XXXXX</checkresult>``.
 
-The XML data is sent as the http post request argument `XMLDATA`.
+The XML data is sent as the http post request argument ``XMLDATA``.
 
 Here are those two examples above submitted using a curl command.
 
@@ -163,9 +163,9 @@ Service::
     }
 
 
-Multipe check results can be posted using additional `, { "checkresult": { XXXX } }`.
+Multipe check results can be posted using additional ``, { "checkresult": { XXXX } }``.
 
-The JSON data is sent as the http post request argument `JSONDATA`.
+The JSON data is sent as the http post request argument ``JSONDATA``.
 
 Here are those two examples above submitted using a curl command.
 
@@ -184,9 +184,9 @@ NDRP can also submit any of the defined [External Commands](https://assets.nagio
 
 The request data is sent using the following http post request arguments:
 
-* `cmd=submitcmd`
-* `command=XXXXX`
-** The data in the command is identical to how it is document, for example `SCHEDULE_FORCED_SVC_CHECK;somehost;someservice;1110741500`
+* ``cmd=submitcmd``
+* ``command=XXXXX``
+** The data in the command is identical to how it is document, for example ``SCHEDULE_FORCED_SVC_CHECK;somehost;someservice;1110741500``
 
 Here is an example using a curl command::
 
@@ -197,8 +197,8 @@ Permissions
 
 Tokens are used to authorise requests submitted to NRDP. By default, all authorized tokens are allowed to submit any external command (unless it's disabled).
 
-* Defined in `config.inc.php`
-* This is a deny mapping in the form of `COMMAND => TOKEN` or `TOKENS`
+* Defined in ``config.inc.php``
+* This is a deny mapping in the form of ``COMMAND => TOKEN`` or ``TOKENS``
 * You can specify a whole command, or use * as a wildcard
 * Or you can specify 'all' to stop any token from using any external command
 * the tokens specified can either be a string with 1 token, or an array of 1 or more tokens
