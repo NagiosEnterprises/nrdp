@@ -5,6 +5,7 @@ NRDP (Nagios Remote Data Processor) is a simple, PHP-based passive result collec
 
 By default, NRDP has the capability of allowing remote agents, applications, and Nagios instances to submit commands and host and service check results to a Nagios server. This allows Nagios administrators to use NRDP to configure distributed monitoring, passive checks, and remote control of their Nagios instance in a quick and efficient manner. The capabilities for NRDP can be extended through the development of additional NRDP plugins.
 
+
 Installation
 ============
 
@@ -42,12 +43,14 @@ And on Ubuntu 16.0.4::
 
 The NRDP server has now been installed.
 
+
 Testing the Installation
 ------------------------
 
 You can now try out the NRDP server API example by accessing::
 
     http://<ip address>/nrdp
+
 
 Usage
 =====
@@ -58,8 +61,9 @@ There are several ways to use NRDP:
 * Submit check results (XML or JSON) via http post request
 * Submit a Nagios Core EXTERNAL COMMAND via http post request
 
+
 Client Scripts
-------------------------
+--------------
 
 The client scripts that are distributed with NRDP in the ``clients`` folder are clearly documented. They are basically a wrapper script for submitting a http post request.
 More detailed usage examples can be found in the "send_nrdp Client" KB article:
@@ -73,6 +77,7 @@ Which will produce output like::
 
     Sent 1 checks to http://nagios_server/nrdp/
 
+
 Submit check results (XML or JSON) using a http post
 ----------------------------------------------------
 
@@ -82,6 +87,7 @@ The request data is sent using the following http post request arguments:
 
 * ``cmd=submitcheck``
 * ``XMLDATA=XXXXX`` OR ``JSONDATA=XXXXX``
+
 
 **XML Format**
 
@@ -124,6 +130,7 @@ Host::
 Service::
 
     curl -f -d "token=XXXXX&cmd=submitcheck&XMLDATA=<?xml version='1.0'?><checkresults><checkresult type='service' checktype='1'><hostname>somehost</hostname> <servicename>Disk Usage</servicename><state>1</state><output>WARNING: The disk is 75% full | disk_usage=75%;</output></checkresult></checkresults>" http://nagios_server/nrdp/
+
 
 **JSON Format**
 
@@ -177,6 +184,7 @@ Service::
 
     curl -f -d 'token=XXXXX&cmd=submitcheck&JSONDATA={ "checkresults": [ { "checkresult": { "type": "service", "checktype": "1" }, "hostname": "somehost", "servicename": "Disk Usage", "state": "1", "output": "WARNING: The disk is 75% full | disk_usage=75%;" } ] }' http://nagios_server/nrdp/
 
+
 Submit a Nagios Core EXTERNAL COMMAND
 -------------------------------------
 
@@ -191,6 +199,7 @@ The request data is sent using the following http post request arguments:
 Here is an example using a curl command::
 
     curl -f -d 'token=XXXXX&cmd=submitcmd&command=SCHEDULE_FORCED_SVC_CHECK;somehost;someservice;1110741500' http://nagios_server/nrdp/
+
 
 Permissions
 ===========
