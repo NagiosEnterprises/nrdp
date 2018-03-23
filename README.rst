@@ -77,7 +77,6 @@ Which will produce output like::
 
     Sent 1 checks to http://nagios_server/nrdp/
 
-
 Submit check results (XML or JSON) using a http post
 ----------------------------------------------------
 
