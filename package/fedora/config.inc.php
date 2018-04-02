@@ -49,10 +49,10 @@ $cfg["valid_basic_auth_users"] = array(
 $cfg["nagios_command_group"] = "nagcmd";
 
 // Full path to Nagios external command file
-$cfg["command_file"] = "/usr/local/nagios/var/rw/nagios.cmd";
+$cfg["command_file"] = "/var/spool/nagios/cmd/nagios.cmd";
 
 // Full path to check results spool directory
-$cfg["check_results_dir"] = "/usr/local/nagios/var/spool/checkresults";
+$cfg["check_results_dir"] = "/var/log/nagios/spool/checkresults";
 
 // Should we allow external commands? Set to true or false (Boolean, not a string)
 $cfg["disable_external_commands"] = false;
