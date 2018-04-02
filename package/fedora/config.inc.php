@@ -13,6 +13,21 @@ $cfg['authorized_tokens'] = array(
     //"mysecrettoken",  // <-- not a good token
     //"90dfs7jwn3",   // <-- a better token (don't use this exact one, make your own)
 );
+
+// By default, all authorized tokens are allowed to submit any
+// external command (unless it's disable below)
+// This is a deny mapping in the form of COMMAND => TOKEN or TOKENS
+// You can specify a whole command, or use * as a wildcard
+// Or you can specify 'all' to stop any token from using any external command
+// the tokens specified can either be a string with 1 token, or an array of 1 or more tokens
+$cfg['external_commands_deny_tokens'] = array(
+//    "ACKNOWLEDGE_HOST_PROBLEM" => array("mysecrettoken", "myothertoken"),
+//    "ACKNOWLEDGE_SVC_PROBLEM" => "mysecrettoken",
+//    "all" => array("mysecrettoken", "myothertoken"),
+//    "ACKNOWLEDGE_*" => "mysecrettoken",
+//    "*_HOST_*" => array("mysecrettoken", "myothertoken"),
+);
+
     
 // Do we require that HTTPS be used to access NRDP?
 // set this value to 'false' to disable HTTPS requirement
@@ -34,19 +49,28 @@ $cfg["valid_basic_auth_users"] = array(
 $cfg["nagios_command_group"] = "nagcmd";
 
 // Full path to Nagios external command file
-$cfg["command_file"] = "/var/spool/nagios/cmd/nagios.cmd";
+$cfg["command_file"] = "/usr/local/nagios/var/rw/nagios.cmd";
 
 // Full path to check results spool directory
-$cfg["check_results_dir"] = "/var/log/nagios/spool/checkresults";
+$cfg["check_results_dir"] = "/usr/local/nagios/var/spool/checkresults";
 
 // Should we allow external commands? Set to true or false (Boolean, not a string)
 $cfg["disable_external_commands"] = false;
+
+// Allows Nagios XI to send old check results directly into NDO if configured
+$cfg["allow_old_results"] = false;
+
+// Enable debug logging
+$cfg["debug"] = false;
+
+// Where should the logs go?
+$cfg["debug_log"] = "/usr/local/nrdp/server/debug.log";
 
 
 ///////// DONT MODIFY ANYTHING BELOW THIS LINE /////////
 
 $cfg['product_name'] = 'nrdp';
-$cfg['product_version'] = '1.4.0'
+$cfg['product_version'] = '1.5.2'
 
 
 ?>
