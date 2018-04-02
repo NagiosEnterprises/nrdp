@@ -1,4 +1,4 @@
-1.5.2 - 03/22/2018
+1.5.2 - 04/02/2018
 ------------------
 - Set executable bits on send_nrdp.php and send_nrdp.sh (#29) -tjyang
 - Added debugging to check_token() and check_auth() even in failure cases -BH
