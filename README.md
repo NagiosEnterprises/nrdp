@@ -68,7 +68,7 @@ The client scripts that are distributed with NRDP in the ``clients`` folder are 
 More detailed usage examples can be found in the "send_nrdp Client" KB article:
 https://support.nagios.com/kb/article.php?id=599
 
-Here is a service example with a WARNING state:::
+Here is a service example with a WARNING state::
 
     ./send_nrdp.sh -u http://nagios_server/nrdp/ -t XXXXX -H somehost -s "Disk Usage" -S 1 -o "WARNING: The disk is 75% full"
 
