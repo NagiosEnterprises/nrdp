@@ -388,7 +388,7 @@ if (!function_exists('_debug')) {
         if (!$debug)
             return;
 
-        $file = grab_array_var($cfg, "debug_file", "/usr/local/nrdp/server/debug.log");
+        $file = grab_array_var($cfg, "debug_log", "/usr/local/nrdp/server/debug.log");
         $date = '[' . date('r') . '] ';
         $datepad = str_pad(' ', strlen($date));
 
