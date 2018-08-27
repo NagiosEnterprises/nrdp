@@ -236,7 +236,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
 
     // chgrp if the function we want doesn't exist
     // or if it does exist and doesn't return false
-    if (!function_exists("posix_getgrnam")) {
+    if (function_exists("posix_getgrnam")) {
         if (posix_getgrnam($command_group) !== false) {
 
             $group_changed = chgrp($check_file, $command_group);
