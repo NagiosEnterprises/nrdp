@@ -1,16 +1,42 @@
 #!/bin/bash
-#
-# check_nrdp.sh
-#
-# Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
-# Written by: Scott Wilkerson (nagios@nagios.org)
-#
-# 2017-09-25 Troy Lea aka BOX293
-#  - Fixed script not working with arguments when run as a cron job
-#    or if being used as a nagios command like obsessive compulsive.
-#     ... "if [ ! -t 0 ]" was the reason why.
-# 2017-12-08 Jørgen van der Meulen (Conclusion Xforce)
-#  - Fixed typo in NRDP abbreviation
+
+##############################################################################
+ #
+ #
+ #  send_nrdp.sh - Send host/service checkresults to NRDP with XML
+ #
+ #
+ #  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ #  Originally Authored: Scott Wilkerson (nagios@nagios.org)
+ #
+ #  License: GNU General Public License version 3
+ #
+ #
+ #  This program is free software: you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License as published by
+ #  the Free Software Foundation, either version 3 of the License, or
+ #  (at your option) any later version.
+ #
+ #  This program is distributed in the hope that it will be useful,
+ #  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ #  GNU General Public License for more details.
+ #
+ #  You should have received a copy of the GNU General Public License
+ #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #
+ #############################################################################
+ #
+ # 2017-09-25 Troy Lea aka BOX293
+ #
+ #  - Fixed script not working with arguments when run as a cron job
+ #    or if being used as a nagios command like obsessive compulsive.
+ #     ... "if [ ! -t 0 ]" was the reason why.
+ #
+ # 2017-12-08 Jørgen van der Meulen (Conclusion Xforce)
+ #  - Fixed typo in NRDP abbreviation
+ #
+ #############################################################################
 
 
 PROGNAME=$(basename $0)
@@ -41,22 +67,22 @@ print_help() {
         echo ""
         echo "Options:"
         echo "    Single Check:"
-        echo "        -H    host name"
-        echo "        -s    service name"
+        echo "        -H    Host name"
+        echo "        -s    Service description"
         echo "        -S    State"
-        echo "        -o     output"
+        echo "        -o    Output"
         echo ""
         echo "    STDIN:"
-        echo "        [-d    delimiter] (default -d \"\\t\")"
+        echo "        -d    Delimiter (Optional, default -d \"\\t\")"
         echo "        With only the required parameters $PROGNAME is capable of"
         echo "        processing data piped to it either from a file or other"
         echo "        process.  By default, we use \t as the delimiter however this"
         echo "        may be specified with the -d option data should be in the"
         echo "        following formats one entry per line."
         echo "        For Host checks:"
-        echo "        hostname    State    output"
+        echo "        Hostname	State	Output"
         echo "        For Service checks"
-        echo "        hostname    servicename    State    output"
+        echo "        Hostname	Servicedesc	State	Output"
         echo ""
         echo "    File:"
         echo "        -f /full/path/to/file"
@@ -95,16 +121,16 @@ send_data() {
     if [ ! "x$curl" == "x" ];then
 
         if [ $file ]; then
-            fdata="--data-urlencode XMLDATA@$file"
+            fdata="--data-urlencode xml@$file"
             rslt=`curl -f --silent --insecure -d "$pdata" $fdata "$url/"`
         else
-            pdata="$pdata&XMLDATA=$1"
+            pdata="$pdata&xml=$1"
             rslt=`curl -f --silent --insecure -d "$pdata" "$url/"`
         fi
         
         ret=$?
     else
-        pdata="$pdata&XMLDATA=$1"
+        pdata="$pdata&xml=$1"
         rslt=`wget -q -O - --post-data="$pdata" "$url/"`
         ret=$?
     fi

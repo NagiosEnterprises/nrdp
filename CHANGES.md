@@ -1,3 +1,8 @@
+2.0.0 - ??/??/????
+------------------
+- Changed license to GPLv3 (#32) -BH,EG
+
+
 1.5.2 - 04/02/2018
 ------------------
 - Set executable bits on send_nrdp.php and send_nrdp.sh (#29) -tjyang
