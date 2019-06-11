@@ -1,7 +1,7 @@
 2.0.0 - ??/??/????
 ------------------
 - Changed license to GPLv3 (#32) -BH,EG
-
+- Fixed debug_log variable not being used (#36)
 
 1.5.2 - 04/02/2018
 ------------------
