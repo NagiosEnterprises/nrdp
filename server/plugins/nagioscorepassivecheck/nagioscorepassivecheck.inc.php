@@ -32,22 +32,19 @@ require_once(dirname(__FILE__) . "/../../includes/utils.inc.php");
 register_callback(CALLBACK_PROCESS_REQUEST, "nagioscorepassivecheck_process_request");
 
 
-
 // process a command for this plugin
 function nagioscorepassivecheck_process_request($cbtype, $args)
 {
     $cmd = grab_array_var($args, "cmd");
     _debug("nagioscorepassivecheck_process_request(cbtype = {$cbtype}, args[cmd] = {$cmd}");
 
-
+    // Submit check data
     if ($cmd == "submitcheck") {
         nagioscorepassivecheck_submit_check_data();
     }
 
-
     _debug("nagioscorepassivecheck_process_request() had no registered callbacks, returning");
 }
-
 
 
 // attempt to submit check data

@@ -94,11 +94,13 @@ function route_request()
         say_hello();
     }
 
+    // Check for authenticated token
+    check_token();
+
     $args = array(
         "cmd" => $cmd
     );
     do_callbacks(CALLBACK_PROCESS_REQUEST, $args);
-
 
     // A callback should have exited already
     echo "No command specified or request handler";
@@ -344,7 +346,7 @@ function display_form()
                             </small>
                         </div>
 
-                        <button type="button" class="btn btn-primary submit-command">Submit Command</button>
+                        <a href="#" class="btn btn-primary submit-command">Submit Command</a>
 
                     </div><!-- /command-tab -->
 
@@ -374,7 +376,7 @@ function display_form()
                                     </small>
                                 </div>
 
-                                <button type="button" class="btn btn-primary submit-checkresult-xml">Submit XML Check Result</button>
+                                <a href="#" class="btn btn-primary submit-checkresult-xml">Submit XML Check Result</a>
 
                             </div><!-- /xmltab -->
 
@@ -388,7 +390,7 @@ function display_form()
                                     </small>
                                 </div>
 
-                                <button type="button" class="btn btn-primary submit-checkresult-json">Submit JSON Check Result</button>
+                                <a href="#" class="btn btn-primary submit-checkresult-json">Submit JSON Check Result</a>
 
                             </div><!-- /jsontab -->
 
