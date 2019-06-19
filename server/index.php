@@ -26,46 +26,33 @@
  *****************************************************************************/
 
 
-
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 // Page Settings
 // (Change these variables to customize your NRDP landing page)
 ///////////////////
 
-
-
 // Should we display a token by default?
-
 $display_token = true;
 $page_token = "token";
 
 
-
 // There are several tabs you can land on
-
 //$default_tab = "command";
 //$default_tab = "checkresult";
 //$default_tab = "xml";
 $default_tab = "json";
 
-
-
 // Do you want the alerts at the top of the page? Or on the bottom?
-
-//$display_alerts = "top";
-$display_alerts = "bottom";
-
+//$display_alerts = "bottom";
+$display_alerts = "top";
 
 
 // What is the alert message timeout? (in seconds)
-
 $alert_timeout = 3;
 
 
-
 // This is the example data that will be populated in the data on the page
-
 $fake_command               = "DISABLE_HOST_NOTIFICATIONS";
 $fake_host_name             = "somehost";
 $fake_service_description   = "someservice";
@@ -75,8 +62,6 @@ $fake_output_bad            = "WARNING: Danger Will Robinson! | perfdata=1;";
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 require_once(dirname(__FILE__) . "/config.inc.php");
@@ -97,18 +82,17 @@ route_request();
 
 function route_request()
 {
+    global $cfg;
     $cmd = strtolower(grab_request_var("cmd"));
 
-    // if no command was specified
-    if (empty($cmd)) {
+    // If no command was specified check if we should show the options
+    if (empty($cmd) && empty($cfg['hide_display_page'])) {
         display_form();
     }
-
 
     if ($cmd == "hello") {
         say_hello();
     }
-
 
     $args = array(
         "cmd" => $cmd
@@ -116,8 +100,8 @@ function route_request()
     do_callbacks(CALLBACK_PROCESS_REQUEST, $args);
 
 
-    // a callback should have exited already
-    echo "NO REQUEST HANDLER";
+    // A callback should have exited already
+    echo "No command specified or request handler";
     exit();
 }
 
@@ -215,8 +199,8 @@ function display_form()
 
         function success_xml(xml) {
 
-            console.log("success_xml(xml) data:");
-            console.log(xml);
+            //console.log("success_xml(xml) data:");
+            //console.log(xml);
 
             var status = $(xml).find("status").text();
             var msg = $(xml).find("message").text();
@@ -226,8 +210,8 @@ function display_form()
 
         function success_json(json) {
 
-            console.log("success_json(json) data:");
-            console.log(json);
+            //console.log("success_json(json) data:");
+            //console.log(json);
 
             var status = json.result.status;
             var msg = json.result.message;

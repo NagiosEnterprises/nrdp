@@ -152,6 +152,16 @@ $cfg["allow_old_results"] = false;
 
 /////////////////////////////////////////////////////////////
 //
+// hide_display_page
+//
+// Should the main NRDP display page that allows submissions be hidden? true/false
+
+$cfg["hide_display_page"] = false;
+
+
+
+/////////////////////////////////////////////////////////////
+//
 // debug
 //
 // Enable debug logging

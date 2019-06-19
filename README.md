@@ -18,8 +18,8 @@ Download the latest tarball and extract to start the install:
 
 ```
 cd /tmp
-wget https://github.com/NagiosEnterprises/nrdp/archive/1.5.2.tar.gz
-tar xvf 1.5.2.tar.ggz
+wget https://github.com/NagiosEnterprises/nrdp/archive/2.0.0.tar.gz
+tar xvf 2.0.0.tar.gz
 cd nrdp-*
 ```
 
@@ -37,14 +37,14 @@ Edit the NRDP server config file and add your token to the `$cfg['authorized_tok
 vi /usr/local/nrdp/server/config.inc.php
 ```
     
-Configure Apache depending on the current Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6:
+Configure Apache depending on the current Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6 and 7:
 
 ```
 cp nrdp.conf /etc/httpd/conf.d
 service httpd restart
 ```
 
-And on Ubuntu 16.0.4:
+And on Ubuntu 16 and 18 LTS:
 
 ```
 cp nrdp.conf /etc/apache2/sites-enabled/nrdp.conf

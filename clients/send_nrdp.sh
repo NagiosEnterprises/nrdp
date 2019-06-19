@@ -27,8 +27,10 @@
  #
  #############################################################################
  #
- # 2017-09-25 Troy Lea aka BOX293
+ # 2019-06-19 Jake Omann
+ #  - Fixed issue with XML output formatting on some PHP versions
  #
+ # 2017-09-25 Troy Lea aka BOX293
  #  - Fixed script not working with arguments when run as a cron job
  #    or if being used as a nagios command like obsessive compulsive.
  #     ... "if [ ! -t 0 ]" was the reason why.
@@ -236,7 +238,8 @@ if [ $host ]; then
         exit 2
     fi
     if [ "$service" != "" ]; then
-        xml="$xml<checkresult type='service' checktype='$checktype'><servicename>$service</servicename>"
+        xml="$xml<checkresult type='service' checktype='$checktype'>
+        <servicename>$service</servicename>"
     else
         xml="$xml<checkresult type='host' checktype='$checktype'>"
     fi
@@ -246,7 +249,10 @@ if [ $host ]; then
     output=${output//</%3C}
     output=${output//>/%3E}
     
-    xml="$xml<hostname>$host</hostname><state>$State</state><output><![CDATA["$output"]]></output></checkresult>"
+    xml="$xml<hostname>$host</hostname>
+    <state>$State</state>
+    <output><![CDATA["$output"]]></output>
+    </checkresult>"
     checkcount=1
 fi
 
@@ -301,7 +307,10 @@ if [ $directory ]; then
 fi
 
 if [ "x$file" == "x" ] && [ "x$directory" == "x" ]; then
-    xml="<?xml version='1.0'?><checkresults>$xml</checkresults>"
+    xml="<?xml version='1.0'?>
+    <checkresults>
+    $xml
+    </checkresults>"
     send_data "$xml"
     echo "Sent $checkcount checks to $url"
 fi
