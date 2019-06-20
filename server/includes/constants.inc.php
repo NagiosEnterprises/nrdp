@@ -1,10 +1,33 @@
 <?php
-//
-// NRDP Constants
-//
-// Copyright (c) 2008-2017 - Nagios Enterprises, LLC. All rights reserved.
-// License: Nagios Open Software License <http://www.nagios.com/legal/licenses>
-//
+/*****************************************************************************
+ *
+ *
+ *  NRDP Constants
+ *
+ *
+ *  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ *
+ *  License: GNU General Public License version 3
+ *
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *****************************************************************************/
+
+// PRODUCT INFO
+define("PRODUCT_NAME", "nrdp");
+define("PRODUCT_VERSION", "2.0.0");
 
 // ERROR STRINGS
 define("ERROR_CAPABILITY_NOT_ENABLED","NOT ENABLED");
@@ -48,3 +71,7 @@ define("ERROR_BAD_JSON","BAD JSON");
 
 // CALLBACKS
 define("CALLBACK_PROCESS_REQUEST","PROCESS_REQUEST");
+
+// OUTPUT TYPES
+define("TYPE_XML", "TYPE_XML");
+define("TYPE_JSON", "TYPE_JSON");

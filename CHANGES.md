@@ -1,3 +1,10 @@
+2.0.0 - 06/20/2019
+------------------
+- Added the config option to hide the index.php submit commands page -JO
+- Updated license to GPLv3 (#32) -BH,EG
+- Updated default location of alert on the main index.php when running checks -JO
+- Fixed debug_log variable not being used (#36) -JO
+
 1.5.2 - 04/02/2018
 ------------------
 - Set executable bits on send_nrdp.php and send_nrdp.sh (#29) -tjyang

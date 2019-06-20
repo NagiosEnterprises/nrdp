@@ -1,38 +1,35 @@
 #!/usr/bin/php -q
 <?php
-//
-// send_nrdp.php
-//
-// Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
-// Portions Copyright (c) others - see source code below.
-//
-// Software License:
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// * Redistributions of source code must retain the above copyright notice, this
-//   list of conditions and the following disclaimer.
-// * Redistributions in binary form must reproduce the above copyright notice,
-//   this list of conditions and the following disclaimer in the documentation and/or
-//   other materials provided with the distribution.
-// * Neither the name of the Nagios Enterprises, LLC nor the names of its contributors
-//   may be used to endorse or promote products derived from this software without
-//   specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
-// SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-// TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-// BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
-// OF SUCH DAMAGE.
-//
+/*****************************************************************************
+ *
+ *
+ *  send_nrdp.php - Send host/service checkresults to NRDP with XML
+ *
+ *
+ *  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ *  Portions Copyright (c) others - see source code below
+ *
+ *  License: GNU General Public License version 3
+ *
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *****************************************************************************/
+
 // 2017-08-15 Troy Lea aka BOX293
 //  - Updated load_url function to work with https
+
 
 doit();
 
@@ -163,7 +160,7 @@ function doit()
 </checkresults>";
 
     // Build URL
-    $theurl = $url."/?token=".$token."&cmd=submitcheck&XMLDATA=".urlencode($xml);
+    $theurl = $url."/?token=".$token."&cmd=submitcheck&xml=".urlencode($xml);
 
     // Send data to NRDP
     $opts = array(

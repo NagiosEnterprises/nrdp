@@ -1,23 +1,49 @@
 #!/usr/bin/env python
-#
-# send_nrdp.py
-#
-# Copyright (c) 2010-2017 - Nagios Enterprises, LLC.
-# Written by: Scott Wilkerson (nagios@nagios.org)
-#
-# 2017-09-22 Troy Lea aka BOX293
-#  - Fixed setup function that was not working for piped results
-#    as the xml string was missing "</checkresults>"
-#  - Fixed setup function that was not working with arguments when
-#    run as a cron job or if being used as a nagios command like
-#    obsessive compulsive ... "if not sys.stdin.isatty():" was the
-#    reason why.
-# 2017-09-25 Troy Lea aka BOX293
-#  - Added file argument to allow XML results to be read from file
-#  - Replaced optparse with argparse so help text can include newline
-#    characters, allowing for better formatting.
-# 2017-09-26 Troy Lea aka BOX293
-#  - Made sure url ends with a / before posting
+
+##############################################################################
+ #
+ #
+ #  send_nrdp.py - Send host/service checkresults to NRDP with XML
+ #
+ #
+ #  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ #  Originally Authored: Scott Wilkerson (nagios@nagios.org)
+ #
+ #  License: GNU General Public License version 3
+ #
+ #
+ #  This program is free software: you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License as published by
+ #  the Free Software Foundation, either version 3 of the License, or
+ #  (at your option) any later version.
+ #
+ #  This program is distributed in the hope that it will be useful,
+ #  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ #  GNU General Public License for more details.
+ #
+ #  You should have received a copy of the GNU General Public License
+ #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #
+ #############################################################################
+ #
+ # 2017-09-22 Troy Lea aka BOX293
+ #  - Fixed setup function that was not working for piped results
+ #    as the xml string was missing "</checkresults>"
+ #  - Fixed setup function that was not working with arguments when
+ #    run as a cron job or if being used as a nagios command like
+ #    obsessive compulsive ... "if not sys.stdin.isatty():" was the
+ #    reason why.
+ #
+ # 2017-09-25 Troy Lea aka BOX293
+ #  - Added file argument to allow XML results to be read from file
+ #  - Replaced optparse with argparse so help text can include newline
+ #    characters, allowing for better formatting.
+ #
+ # 2017-09-26 Troy Lea aka BOX293
+ #  - Made sure url ends with a / before posting
+ #
+ #############################################################################
 
 
 import argparse, sys, urllib, cgi
@@ -105,7 +131,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
         if not url.endswith('/'):
             url += '/'
         
-        params = urllib.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'XMLDATA': xml});
+        params = urllib.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'xml': xml});
         opener = urllib.FancyURLopener()
         try:
             f = opener.open(url, params)
