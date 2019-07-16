@@ -52,7 +52,7 @@ function nagioscorepassivecheck_submit_check_data()
 {
     // debug the request data
     global $request;
-    foreach($request as $index => $req) {
+    foreach ($request as $index => $req) {
         if (is_array($req)) {
             $req = print_r($req, true);
         }
@@ -68,7 +68,7 @@ function nagioscorepassivecheck_submit_check_data()
         $data = grab_xml();
         $data = @simplexml_load_string($data);
 
-        if ($data == false) {
+        if ($data === false) {
 
             $xmlerr = print_r(libxml_get_errors(), true);
             _debug("conversion to xml failed: {$xmlerr}");

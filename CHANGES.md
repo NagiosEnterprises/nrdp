@@ -1,3 +1,7 @@
+2.0.1 - 07/16/2019
+------------------
+- Fixed issue where xml data after decode would not pass valid data check -JO
+
 2.0.0 - 06/20/2019
 ------------------
 - Added the config option to hide the index.php submit commands page -JO
