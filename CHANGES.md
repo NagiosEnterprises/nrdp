@@ -1,3 +1,7 @@
+2.0.2 - 07/18/2019
+------------------
+- Fixed issue with passive check timestamp not being applied properly -SW
+
 2.0.1 - 07/16/2019
 ------------------
 - Fixed issue where xml data after decode would not pass valid data check -JO
