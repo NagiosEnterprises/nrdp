@@ -213,7 +213,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
 
     // file contents
     $check_result_contents = "### NRDP Check ###\n";
-    $check_result_contents .= "start_time=" . time() . "\n";
+    $check_result_contents .= "start_time=" . time() . ".0\n";
     $check_result_contents .= "# Time: " . date("r") . "\n";
     $check_result_contents .= "host_name={$hostname}\n";
     $check_result_contents .= $service_line;
