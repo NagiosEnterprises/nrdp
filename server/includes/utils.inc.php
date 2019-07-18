@@ -325,11 +325,24 @@ function get_xml_or_json($type, $var, $xml, $json, $xml_func = false, $default =
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////
 // MISC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
+
+if (!function_exists('have_value')) {
+    function have_value($var) {
+        if (!isset($var))
+            return false;
+        else if (is_null($var))
+            return false;
+        else if (empty($var))
+            return false;
+        else if ($var == "")
+            return false;
+        return true;
+    }
+}
 
 
 // gets value from array using default
