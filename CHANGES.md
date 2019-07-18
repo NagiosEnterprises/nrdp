@@ -1,6 +1,7 @@
 2.0.2 - 07/18/2019
 ------------------
 - Fixed issue with passive check timestamp not being applied properly -SW
+- Fixed error with missing have_value() function when using nrds with nrdp -JO
 
 2.0.1 - 07/16/2019
 ------------------
