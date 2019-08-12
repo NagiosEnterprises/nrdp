@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ##############################################################################
  #
@@ -46,7 +46,8 @@
  #############################################################################
 
 
-import argparse, sys, urllib, cgi
+import argparse, sys, html
+from urllib import request as UrlRequest, parse as UrlParse
 from xml.dom.minidom import parseString
 
 class send_nrdp:
@@ -116,7 +117,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
         try:
             self.setup(options)
             sys.exit()
-        except Exception, e:
+        except Exception as e:
             sys.exit(e)
         
     def getText(self, nodelist):
@@ -130,21 +131,19 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
         # Make sure URL ends with a /
         if not url.endswith('/'):
             url += '/'
-        
-        params = urllib.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'xml': xml});
-        opener = urllib.FancyURLopener()
+        params = UrlParse.urlencode({'token': token.strip(), 'cmd': 'submitcheck', 'XMLDATA': xml});
+        url_with_data = "{0}?{1}".format(url, params)
         try:
-            f = opener.open(url, params)
-            result = parseString(f.read())
-        except Exception, e:
-            print "Cannot connect to url."
-            # TODO add directory option
-            sys.exit(e)
+            with UrlRequest.urlopen(url_with_data) as f:
+                result = parseString(f.read().decode('utf-8'))
+        except Exception as e:
+            print("ERROR - Cannot connect to url: {0}".format(str(e)))
+            return -3
         if self.getText(result.getElementsByTagName("status")[0].childNodes) == "0":
-            sys.exit()
+            return 1
         else:
-            print "ERROR - NRDP Returned: "+self.getText(result.getElementsByTagName("message")[0].childNodes)
-            sys.exit(1)
+            print("ERROR - NRDP Returned: " + self.getText(result.getElementsByTagName("message")[0].childNodes))
+            return -1
 
     def setup(self, options):
         if not options.delim:
@@ -159,16 +158,16 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
                 parts = line.split(options.delim)
                 if len(parts) == 4:
                     xml += "<checkresult type='service' checktype='"+options.checktype+"'>"
-                    xml += "<hostname>"+cgi.escape(parts[0],True)+"</hostname>"
-                    xml += "<servicename>"+cgi.escape(parts[1],True)+"</servicename>"
+                    xml += "<hostname>"+html.escape(parts[0],True)+"</hostname>"
+                    xml += "<servicename>"+html.escape(parts[1],True)+"</servicename>"
                     xml += "<state>"+parts[2]+"</state>"
-                    xml += "<output>"+cgi.escape(parts[3],True)+"</output>"
+                    xml += "<output>"+html.escape(parts[3],True)+"</output>"
                     xml += "</checkresult>"
                 if len(parts) == 3:
                     xml += "<checkresult type='host' checktype='"+options.checktype+"'>"
-                    xml += "<hostname>"+cgi.escape(parts[0],True)+"</hostname>"
+                    xml += "<hostname>"+html.escape(parts[0],True)+"</hostname>"
                     xml += "<state>"+parts[1]+"</state>"
-                    xml += "<output>"+cgi.escape(parts[2],True)+"</output>"
+                    xml += "<output>"+html.escape(parts[2],True)+"</output>"
                     xml += "</checkresult>"
                 xml += "</checkresults>"
         
@@ -176,30 +175,30 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
             xml="<?xml version='1.0'?>\n<checkresults>\n";
             if options.service:
                 xml += "<checkresult type='service' checktype='"+options.checktype+"'>"
-                xml += "<hostname>"+cgi.escape(options.hostname,True)+"</hostname>"
-                xml += "<servicename>"+cgi.escape(options.service,True)+"</servicename>"
+                xml += "<hostname>"+html.escape(options.hostname,True)+"</hostname>"
+                xml += "<servicename>"+html.escape(options.service,True)+"</servicename>"
                 xml += "<state>"+options.state+"</state>"
-                xml += "<output>"+cgi.escape(options.output,True)+"</output>"
+                xml += "<output>"+html.escape(options.output,True)+"</output>"
                 xml += "</checkresult>"
             else:
                 xml += "<checkresult type='host'  checktype='"+options.checktype+"'>"
-                xml += "<hostname>"+cgi.escape(options.hostname,True)+"</hostname>"
+                xml += "<hostname>"+html.escape(options.hostname,True)+"</hostname>"
                 xml += "<state>"+options.state+"</state>"
-                xml += "<output>"+cgi.escape(options.output,True)+"</output>"
+                xml += "<output>"+html.escape(options.output,True)+"</output>"
                 xml += "</checkresult>"
             xml += "</checkresults>"
 
         elif options.file:
             try:
                 file_handle = open(options.file, 'r')
-            except Exception, e:
-                print "Error opening file '"+options.file+"'"
-                sys.exit(e)
+            except Exception as e:
+                print("ERROR - in opening file: " + options.file)
+                return -4
             else:
                 xml = file_handle.read()
                 file_handle.close()
 
-        self.post_data(options.url, options.token, xml)
+        return self.post_data(options.url, options.token, xml)
 
 if __name__ == "__main__":
     send_nrdp().run()
