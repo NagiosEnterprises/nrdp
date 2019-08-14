@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-##############################################################################
+ #############################################################################
  #
  #
  #  send_nrdp.py - Send host/service checkresults to NRDP with XML
@@ -56,7 +56,7 @@ from xml.dom.minidom import parseString
 class send_nrdp:
     def run(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        
+
         parser.add_argument('-u', '--url', action="store",
             dest="url", help="\
 ** REQUIRED ** The URL used to access the remote NRDP agent.")
@@ -110,9 +110,9 @@ printf \"<hostname>\\t<state>\\t<output>\\n\"\n\
 printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
         parser.add_argument('-c', '--checktype', action="store",
             dest="checktype", help="1 for passive 0 for active")
-        
+
         options = parser.parse_args()
-	
+
         if not options.url:
             parser.error('You must specify a url.')
         if not options.token:
@@ -122,7 +122,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
             sys.exit()
         except Exception as e:
             sys.exit(e)
-        
+
     def getText(self, nodelist):
         rc = []
         for node in nodelist:
@@ -153,7 +153,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
             options.delim = "\t"
         if not options.checktype:
             options.checktype = "1"
-        
+
         # If only url and token have been provided then it is assumed that data is being piped
         if not options.hostname and not options.state and not options.file:
             xml="<?xml version='1.0'?>\n<checkresults>\n";
@@ -173,7 +173,7 @@ printf \"<hostname>\\t<service>\\t<state>\\t<output>\\n\"\n")
                     xml += "<output>"+html.escape(parts[2],True)+"</output>"
                     xml += "</checkresult>"
                 xml += "</checkresults>"
-        
+
         elif options.hostname and options.state:
             xml="<?xml version='1.0'?>\n<checkresults>\n";
             if options.service:
