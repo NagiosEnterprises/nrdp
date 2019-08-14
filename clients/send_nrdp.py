@@ -45,9 +45,12 @@
  #
  #############################################################################
 
-
-import argparse, sys, html
-from urllib import request as UrlRequest, parse as UrlParse
+import argparse, sys
+from html import escape
+from future.standard_library import install_aliases
+install_aliases()
+from urllib import request as UrlRequest
+from urllib import parse as UrlParse
 from xml.dom.minidom import parseString
 
 class send_nrdp:
