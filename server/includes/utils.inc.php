@@ -5,7 +5,7 @@
  *  NRDP Common Utilities
  *
  *
- *  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ *  Copyright (c) 2008-2020 - Nagios Enterprises, LLC. All rights reserved.
  *
  *  License: GNU General Public License version 3
  *
@@ -447,22 +447,21 @@ function check_auth()
 
     $require_https = grab_cfg_var("require_https", false);
 
+    // Verify that we are using HTTPS if we are required
     if ($require_https == true) {
-
-        _debug(" * require_https either not set or non-false (is required)");
-
-        if (!empty($_SERVER['HTTPS'])) {
-
-            _debug(" * no https usage, denying auth");
+        _debug(" * require_https is set to true, checking to make sure request was via HTTPS");
+        if (empty($_SERVER['HTTPS'])) {
+            _debug(" * not using https, denying auth");
             handle_api_error(ERROR_HTTPS_REQUIRED);
         }
     }
 
     $require_basic_auth = grab_cfg_var("require_basic_auth", false);
 
+    // Verify against basic auth if it is set
     if ($require_basic_auth == true) {
 
-        _debug(" * require_basic_auth either not set or non-false (is required)");
+        _debug(" * require_basic_auth is set to true, checking against basic auth users");
 
         $remote_user = grab_array_var($_SERVER, "REMOTE_USER");
 

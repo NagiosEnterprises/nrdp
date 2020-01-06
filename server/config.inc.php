@@ -5,7 +5,7 @@
  *  NRDP Configuration file
  *
  *
- *  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ *  Copyright (c) 2008-2020 - Nagios Enterprises, LLC. All rights reserved.
  *
  *  License: GNU General Public License version 3
  *

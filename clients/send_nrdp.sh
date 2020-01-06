@@ -6,7 +6,7 @@
  #  send_nrdp.sh - Send host/service checkresults to NRDP with XML
  #
  #
- #  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ #  Copyright (c) 2008-2020 - Nagios Enterprises, LLC. All rights reserved.
  #  Originally Authored: Scott Wilkerson (nagios@nagios.org)
  #
  #  License: GNU General Public License version 3

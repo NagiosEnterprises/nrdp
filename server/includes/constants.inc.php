@@ -5,7 +5,7 @@
  *  NRDP Constants
  *
  *
- *  Copyright (c) 2008-2018 - Nagios Enterprises, LLC. All rights reserved.
+ *  Copyright (c) 2008-2020 - Nagios Enterprises, LLC. All rights reserved.
  *
  *  License: GNU General Public License version 3
  *
@@ -27,7 +27,7 @@
 
 // PRODUCT INFO
 define("PRODUCT_NAME", "nrdp");
-define("PRODUCT_VERSION", "2.0.1");
+define("PRODUCT_VERSION", "2.0.3");
 
 // ERROR STRINGS
 define("ERROR_CAPABILITY_NOT_ENABLED","NOT ENABLED");

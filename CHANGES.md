@@ -1,3 +1,7 @@
+2.0.3 - 01/06/2020
+------------------
+- Fixed issue with require_https exiting improperly when set to true -JO
+
 2.0.2 - 07/18/2019
 ------------------
 - Fixed issue with passive check timestamp not being applied properly -SW
