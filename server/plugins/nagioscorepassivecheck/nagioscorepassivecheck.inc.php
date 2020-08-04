@@ -145,7 +145,7 @@ function nagioscorepassivecheck_submit_check_data()
         $time = intval(get_xml_or_json($output_type, $cr, "time", "time"));
 
 
-        $debug_msg = "gathered the following datas:\n";
+        $debug_msg = "gathered the following data:\n";
         $debug_msg .= "type: {$type}\n";
         $debug_msg .= "hostname: {$hostname}\n";
         $debug_msg .= "servicename: {$servicename}\n";
