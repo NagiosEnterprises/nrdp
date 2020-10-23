@@ -100,8 +100,20 @@ function doit()
                 );
                 $hostchecks[] = $newc;
             }
+	    // Host check containing $delim in output
+            else if ($fields >= 4 && preg_match('/[0-3]/', $parts[1])) {
+                $hostname = $parts[0];
+                $state = $parts[1];
+                $output = implode($delim, array_slice($parts, 2));
+                $newc = array(
+                    "hostname" => $hostname,
+                    "state" => $state,
+                    "output" => $output
+                );
+                $hostchecks[] = $newc;
+            }
             // Service check
-            else if ($fields >= 4) {
+            else if ($fields >= 4 && !preg_match('/[0-3]/', $parts[1])) {
                 $hostname = $parts[0];
                 $servicename = $parts[1];
                 $state = $parts[2];
@@ -120,7 +132,7 @@ function doit()
     // Craft the XML to send
     $checkresultopts = "";
     $checkresultopts = " checktype='".$checktype."'";
-    $xml = "<?xml version='1.0'?> 
+    $xml = "<?xml version='1.0'?>
 <checkresults>
 ";
 
@@ -316,7 +328,7 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
     ///////////////////////////// Curl /////////////////////////////////////
     // If curl is available, use curl to get the data and don't use curl if
     // it is specifically stated to use fsocketopen in the options
-    if (function_exists("curl_init") and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) { 
+    if (function_exists("curl_init") and (!(isset($options['use']) and $options['use'] == 'fsocketopen'))) {
 
         if (isset($options['method']) and $options['method'] == 'post') {
             $page = $url_parts['scheme'] . '://' . $url_parts['host'] . ':' . $port . $url_parts['path'];
@@ -364,7 +376,7 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
     //////////////////////////////////////////// FSockOpen //////////////////////////////
     } else {
         // If there is no curl, use fsocketopen
-        
+
         if (isset($url_parts['query'])) {
             if (isset($options['method']) and $options['method'] == 'post') {
                 $page = $url_parts['path'];
@@ -377,12 +389,12 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
 
         $fp = fsockopen($url_parts['host'], $port, $errno, $errstr, 30);
         if ($fp) {
-    
+
             // Added a timeout
             if (isset($options['timeout'])) {
                 stream_set_timeout($fp, $options['timeout']);
             }
-            
+
             $out = '';
             if (isset($options['method']) and $options['method'] == 'post' and isset($url_parts['query'])) {
                 $out .= "POST $page HTTP/1.1\r\n";
@@ -397,7 +409,7 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
             }
 
             $out .= "Connection: Close\r\n";
-            
+
             // HTTP Basic Authorization support
             if (isset($url_parts['user']) and isset($url_parts['pass'])) {
                 $out .= "Authorization: Basic ".base64_encode($url_parts['user'].':'.$url_parts['pass']) . "\r\n";
