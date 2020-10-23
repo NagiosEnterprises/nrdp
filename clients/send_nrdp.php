@@ -101,11 +101,11 @@ function doit()
                 $hostchecks[] = $newc;
             }
             // Service check
-            else if ($fields == 4) {
+            else if ($fields >= 4) {
                 $hostname = $parts[0];
                 $servicename = $parts[1];
                 $state = $parts[2];
-                $output = $parts[3];
+                $output = implode($delim, array_slice($parts, 3));
                 $newc = array(
                     "hostname" => $hostname,
                     "servicename" => $servicename,
