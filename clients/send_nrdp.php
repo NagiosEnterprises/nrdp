@@ -101,12 +101,11 @@ function doit()
                 $hostchecks[] = $newc;
             }
 	    // Host check containing $delim in output
-            else if (    $fields >= 4
+            else if ($fields >= 4
 	             && $parts[1] == "0"
 	             || $parts[1] == "1"
 	             || $parts[1] == "2"
-	             || $parts[1] == "3"
-		     ) {
+	             || $parts[1] == "3") {
                 $hostname = $parts[0];
                 $state = $parts[1];
                 $output = implode($delim, array_slice($parts, 2));
@@ -118,12 +117,11 @@ function doit()
                 $hostchecks[] = $newc;
             }
             // Service check
-            else if (   $fields >= 4
-	             && $parts[1] != "0"
-	             && $parts[1] != "1"
-	             && $parts[1] != "2"
-	             && $parts[1] != "3"
-		     ) {
+            else if ($fields >= 4
+	             && $parts[2] == "0"
+	             || $parts[2] == "1"
+	             || $parts[2] == "2"
+	             || $parts[2] == "3") {
                 $hostname = $parts[0];
                 $servicename = $parts[1];
                 $state = $parts[2];
