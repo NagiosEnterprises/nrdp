@@ -152,9 +152,9 @@ function doit()
 
         $xml .= "
     <checkresult type='host' ".$checkresultopts.">
-        <hostname>".htmlentities($hostname)."</hostname>
+        <hostname>".htmlspecialchars($hostname)."</hostname>
         <state>".$state."</state>
-        <output>".htmlentities($output)."</output>
+        <output>".htmlspecialchars($output)."</output>
     </checkresult>
         ";
     }
@@ -168,10 +168,10 @@ function doit()
 
         $xml .= "
     <checkresult type='service' ".$checkresultopts.">
-        <hostname>".htmlentities($hostname)."</hostname>
-        <servicename>".htmlentities($servicename)."</servicename>
+        <hostname>".htmlspecialchars($hostname)."</hostname>
+        <servicename>".htmlspecialchars($servicename)."</servicename>
         <state>".$state."</state>
-        <output>".htmlentities($output)."</output>
+        <output>".htmlspecialchars($output)."</output>
     </checkresult>
         ";
     }
