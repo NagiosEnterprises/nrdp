@@ -1,3 +1,7 @@
+2.0.4 - ??-??-2020
+------------------
+- Fixed send_nrdp.php doesnt work in case plugin output contains $delim char (#50) (ccztux)
+
 2.0.3 - 01/06/2020
 ------------------
 - Fixed issue with require_https exiting improperly when set to true -JO
