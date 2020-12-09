@@ -1,6 +1,7 @@
 2.0.4 - ??-??-2020
 ------------------
 - Fixed send_nrdp.php doesnt work in case plugin output contains $delim char (#50) (ccztux)
+- Fixed send_nrdp.php produces handle_api_error(msg=BAD XML) (#52) (ccztux)
 
 2.0.3 - 01/06/2020
 ------------------
