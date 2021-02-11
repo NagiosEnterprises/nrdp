@@ -125,6 +125,7 @@ $cfg["command_file"] = "/usr/local/nagios/var/rw/nagios.cmd";
 // check_results_dir
 //
 // Full path to check results spool directory
+// check_result_dir path should be same as check_result_path setting in Nagios's nagios.cfg
 
 $cfg["check_results_dir"] = "/usr/local/nagios/var/spool/checkresults";
 
