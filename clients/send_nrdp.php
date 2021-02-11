@@ -191,7 +191,11 @@ function doit()
 
     $result = load_url($theurl, $opts);
 
-    exit(0);
+    if ($result) {
+    	exit(0);
+    } else {
+    	exit(1);
+    }
 }
 
 
@@ -355,6 +359,7 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Just return the data - not print the whole thing.
         curl_setopt($ch, CURLOPT_HEADER, true); // We need the headers
         curl_setopt($ch, CURLOPT_NOBODY, false); // The content - if true, will not download the contents
+	curl_setopt($ch, CURLOPT_FAILONERROR, true);
         if (isset($options['method']) and $options['method'] == 'post' and $url_parts['query']) {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $url_parts['query']);
@@ -379,7 +384,16 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
 
         $response = curl_exec($ch);
         $info = curl_getinfo($ch); // Some information on the fetch
-        curl_close($ch);
+
+	if ($response === false) {
+		echo "curl error: " . curl_error($ch) . "\n";
+		curl_close($ch);
+		return False;
+	} else {
+		curl_close($ch);
+		return True;
+	}
+
 
     //////////////////////////////////////////// FSockOpen //////////////////////////////
     } else {
@@ -436,7 +450,10 @@ function load_url($url, $options = array('method' => 'get', 'return_info' => fal
                 $response .= fgets($fp, 128);
             }
             fclose($fp);
-        }
+        } else {
+		echo "fsockopen error: $errstr ($errno)\n";
+		return false;
+	}
     }
 
     // Get the headers in an associative array
