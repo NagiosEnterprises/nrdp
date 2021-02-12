@@ -1,5 +1,8 @@
-2.0.4 - ??-??-2020
+2.0.4 - 02/12/2020
 ------------------
+- Updated Bootstrap to version 4.6.0
+- Updated jQuery to version 3.5.1 to fix CVEs
+- Updated send_nrdp.py to Python 3, old Python 2 plugin is check_nrdp_py2.py and unsupported due to EOL
 - Fixed send_nrdp.php doesnt work in case plugin output contains $delim char (#50) (ccztux)
 - Fixed send_nrdp.php produces handle_api_error(msg=BAD XML) (#52) (ccztux)
 - Fixed send_nrdp.php is always returning 0 (#54) (ccztux)

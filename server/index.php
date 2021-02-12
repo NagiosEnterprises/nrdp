@@ -156,9 +156,9 @@ function display_form()
 <html>
 <head>
     <title>Nagios Remote Data Processor</title>
-    <script type="text/javascript" src="includes/jquery-3.2.1.min.js"></script>
-    <link href="includes/bootstrap.min.css" rel="stylesheet" />
-    <script type="text/javascript" src="includes/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="includes/jquery-3.5.1.min.js"></script>
+    <link href="includes/bootstrap-4.6.0.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="includes/bootstrap-4.6.0.bundle.min.js"></script>
     <style>
         body {
             margin: 2em 0;
@@ -181,7 +181,7 @@ function display_form()
 
         function build_alert(cssclass, msg) {
 
-            var $alert = $("<div class=\"alert alert-" + cssclass + " form-control-sm\">" + msg + "</div>");
+            var $alert = $("<div class=\"alert alert-" + cssclass + "\">" + msg + "</div>");
             $(".messages").html($alert);
             return $alert;
         }
