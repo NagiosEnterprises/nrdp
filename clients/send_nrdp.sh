@@ -122,9 +122,8 @@ send_data() {
     pdata="token=$token&cmd=submitcheck"
     if [ ! "x$curl" == "x" ];then
 
-        if [ $file ]; then
-            fdata="--data-urlencode xml@$file"
-            rslt=`curl -f --silent --insecure -d "$pdata" $fdata "$url/"`
+        if [[ -n $file ]]; then
+            rslt=`curl -f --silent --insecure -d "$pdata" --data-urlencode "xml@$file" "$url/"`
         else
             pdata="$pdata&xml=$1"
             rslt=`curl -f --silent --insecure -d "$pdata" "$url/"`
@@ -142,12 +141,12 @@ send_data() {
     if [ $ret != 0 ];then
         echo "ERROR: could not connect to NRDP server at $url"
         # verify we are not processing the directory already and then write to the directory
-        if [ ! "$2" ] && [ $directory ];then
-            if [ ! -d "$directory" ];then
+        if [[ -z $2 && -n $directory ]]; then
+            if [[ ! -d $directory ]];then
                 mkdir -p "$directory"
             fi
             # This is where we write to the tmp directory
-            echo $xml > `mktemp $directory/nrdp.XXXXXX`
+            echo "$xml" > "$(mktemp "$directory/nrdp.XXXXXX")"
         fi
         exit 1
     fi
@@ -156,19 +155,19 @@ send_data() {
         # This means we couldn't connect to NRPD server
         echo "ERROR: The NRDP Server said $message"
         # verify we are not processing the directory already and then write to the directory
-        if [ ! "$2" ] && [ $directory ];then
-            if [ ! -d "$directory" ];then
+        if [[ -z $2 && -n $directory ]]; then
+            if [[ ! -d $directory ]];then
                 mkdir -p "$directory"
             fi
             # This is where we write to the tmp directory
-            echo $xml > `mktemp $directory/nrdp.XXXXXX`
+            echo "$xml" > "$(mktemp "$directory/nrdp.XXXXXX")"
         fi
         
         exit 2
     fi
     
     # If this was a directory call and was successful, remove the file
-    if [ $2 ] && [ "$status" == "0" ];then
+    if [[ -n $2 && $status = '0' ]]; then
         rm -f "$2"
     fi
 
@@ -290,23 +289,23 @@ if [[ ! $host && ! $State && ! $file && ! $directory ]]; then
     IFS=" "
 fi
 
-if [ $file ]; then
-    xml=`cat $file`
+if [[ -n $file ]]; then
+    xml=$(<"$file")
     send_data "$xml"
 fi
 
-if [ $directory ]; then
+if [[ -n $directory ]]; then
     #echo "Processing directory..."
-    for f in `ls $directory`
+    for f in "$directory"/*
     do
       #echo "Processing $f file..."
       # take action on each file. $f store current file name
-      xml=`cat $directory/$f`
+      xml=$(<"$f")
       send_data "$xml" "$directory/$f"
     done
 fi
 
-if [ "x$file" == "x" ] && [ "x$directory" == "x" ]; then
+if [[ -z $file && -z $directory ]]; then
     xml="<?xml version='1.0'?>
     <checkresults>
     $xml
