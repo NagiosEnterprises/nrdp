@@ -128,11 +128,11 @@ send_data() {
             pdata="$pdata&xml=$1"
             rslt=`curl -f --silent --insecure -d "$pdata" "$url/"`
         fi
-        
+
         ret=$?
     else
         pdata="$pdata&xml=$1"
-        rslt=`wget -q -O - --post-data="$pdata" "$url/"`
+        rslt=`wget -q --no-check-certificate -O - --post-data="$pdata" "$url/"`
         ret=$?
     fi
 
@@ -150,7 +150,7 @@ send_data() {
         fi
         exit 1
     fi
-    
+
     if [ "$status" != "0" ];then
         # This means we couldn't connect to NRPD server
         echo "ERROR: The NRDP Server said $message"
@@ -162,10 +162,10 @@ send_data() {
             # This is where we write to the tmp directory
             echo "$xml" > "$(mktemp "$directory/nrdp.XXXXXX")"
         fi
-        
+
         exit 2
     fi
-    
+
     # If this was a directory call and was successful, remove the file
     if [[ -n $2 && $status = '0' ]]; then
         rm -f "$2"
@@ -211,9 +211,9 @@ then
   echo "Usage: send_nrdp -u url -t token"
   exit 1
 fi
-# detecting curl 
+# detecting curl
 if [[ `which curl` =~ "/curl" ]]
- then curl=1; 
+ then curl=1;
 fi
 # detecting wget if we don't have curl
 if [[ `which wget` =~ "/wget" ]]
@@ -242,12 +242,12 @@ if [ $host ]; then
     else
         xml="$xml<checkresult type='host' checktype='$checktype'>"
     fi
-    
+
     # urlencode XML special chars
     output=${output//&/%26}
     output=${output//</%3C}
     output=${output//>/%3E}
-    
+
     xml="$xml<hostname>$host</hostname>
     <state>$State</state>
     <output><![CDATA["$output"]]></output>
@@ -261,7 +261,7 @@ if [[ ! $host && ! $State && ! $file && ! $directory ]]; then
     xml=""
     # we know we are being piped results
     IFS=$delim
-    
+
     while read -r line ; do
         arr=($line)
         if [ ${#arr[@]} != 0 ];then
@@ -280,7 +280,7 @@ if [[ ! $host && ! $State && ! $file && ! $directory ]]; then
                     <state>${arr[1]}</state>
                     <output>${arr[2]}</output>"
                 fi
-                
+
                 xml="$xml</checkresult>"
                 checkcount=$[checkcount+1]
             fi
