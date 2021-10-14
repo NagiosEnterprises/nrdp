@@ -27,7 +27,7 @@
 
 // PRODUCT INFO
 define("PRODUCT_NAME", "nrdp");
-define("PRODUCT_VERSION", "2.0.4");
+define("PRODUCT_VERSION", "2.0.5");
 
 // ERROR STRINGS
 define("ERROR_CAPABILITY_NOT_ENABLED","NOT ENABLED");

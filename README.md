@@ -18,8 +18,8 @@ Download the latest tarball and extract to start the install:
 
 ```
 cd /tmp
-wget https://github.com/NagiosEnterprises/nrdp/archive/2.0.4.tar.gz
-tar xvf 2.0.4.tar.gz
+wget https://github.com/NagiosEnterprises/nrdp/archive/2.0.5.tar.gz
+tar xvf 2.0.5.tar.gz
 cd nrdp-*
 ```
 
