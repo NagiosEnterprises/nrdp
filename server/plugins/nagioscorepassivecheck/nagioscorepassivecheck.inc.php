@@ -25,6 +25,7 @@
  *
  *****************************************************************************/
 
+define("CFG_ONLY", 1);
 require_once(dirname(__FILE__) . "/../../config.inc.php");
 require_once(dirname(__FILE__) . "/../../includes/utils.inc.php");
 
@@ -291,7 +292,7 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
 
     $dbserver = grab_array_var($ndodb, "dbserver");
     $user     = grab_array_var($ndodb, "user");
-    $pass     = grab_array_var($ndodb, "pass");
+    $pass     = grab_array_var($ndodb, "pwd");
     $db       = grab_array_var($ndodb, "db");
 
 

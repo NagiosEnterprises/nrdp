@@ -1,3 +1,8 @@
+2.0.5 - 10/14/2021
+------------------
+- Updated jQuery to version 3.6.0 -JO
+- Fixed spooled passive check reciever for Naigos XI erroring/not connecting to NDO db -JO
+
 2.0.4 - 02/12/2020
 ------------------
 - Updated Bootstrap to version 4.6.0

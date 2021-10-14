@@ -156,7 +156,7 @@ function display_form()
 <html>
 <head>
     <title>Nagios Remote Data Processor</title>
-    <script type="text/javascript" src="includes/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="includes/jquery-3.6.0.min.js"></script>
     <link href="includes/bootstrap-4.6.0.min.css" rel="stylesheet" />
     <script type="text/javascript" src="includes/bootstrap-4.6.0.bundle.min.js"></script>
     <style>
