@@ -65,7 +65,7 @@ function nagioscorepassivecheck_submit_check_data()
 
 
     if ($output_type == TYPE_XML) {
-        
+
         $data = grab_xml();
         $data = @simplexml_load_string($data);
 
@@ -100,7 +100,7 @@ function nagioscorepassivecheck_submit_check_data()
 
         _debug("our json: " . print_r($data, true));
     }
-   
+
 
 
     // Make sure we can write to check results dir
@@ -156,7 +156,7 @@ function nagioscorepassivecheck_submit_check_data()
         $debug_msg .= "time: {$time}\n";
 
         _debug($debug_msg);
-        
+
 
         if (!empty($time) && $allow_old_results == true) {
             nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output, $type, $time);
@@ -219,12 +219,12 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     $check_result_contents .= "host_name={$hostname}\n";
     $check_result_contents .= $service_line;
     $check_result_contents .= "check_type=1\n";
-    $check_result_contents .= "early_timeout=1\n";
+    $check_result_contents .= "early_timeout=0\n";
     $check_result_contents .= "exited_ok=1\n";
     $check_result_contents .= "return_code={$state}\n";
     $check_result_contents .= "output=${output}\\n\n";
 
-    // put check result into the check file    
+    // put check result into the check file
     file_put_contents($check_file, $check_result_contents);
 
 
@@ -252,7 +252,7 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
     if ($mod_changed == false) {
         _debug("unable to change permissions on {$check_file} to 0770");
     }
-    
+
 
     // Create an ok-to-go, so Nagios Core picks it up
     $touched = touch("{$check_file}.ok");
@@ -473,7 +473,7 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
                 {$update_status_sql}
                 latency = 0
                 WHERE service_object_id = {$object_id}";
-        
+
         $db->query($sql);
 
 
@@ -485,16 +485,16 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
 
             $sql = "INSERT INTO nagios_statehistory
                     (
-                      instance_id, state_time, object_id, state_change, 
-                      state, state_type, current_check_attempt, 
-                      max_check_attempts, last_state, last_hard_state, 
+                      instance_id, state_time, object_id, state_change,
+                      state, state_type, current_check_attempt,
+                      max_check_attempts, last_state, last_hard_state,
                       output, long_output
                     )
-                    VALUES 
+                    VALUES
                     (
-                      1, FROM_UNIXTIME({$time}), {$object_id}, 1, 
-                      {$state}, {$state_type}, {$current_attempt}, 
-                      {$max_check_attempts}, {$current_state}, {$last_hard_state}, 
+                      1, FROM_UNIXTIME({$time}), {$object_id}, 1,
+                      {$state}, {$state_type}, {$current_attempt},
+                      {$max_check_attempts}, {$current_state}, {$last_hard_state},
                       '{$output}', '{$long_output}'
                     )";
             $db->query($sql);
@@ -564,14 +564,14 @@ function nrdp_write_check_output_to_ndo($hostname, $servicename, $state, $output
         // add a row into the log entries table
         $sql = "INSERT INTO nagios_logentries
                 (
-                  instance_id, logentry_time, entry_time, 
+                  instance_id, logentry_time, entry_time,
                   entry_time_usec, logentry_type, logentry_data,
                   realtime_data, inferred_data_extracted
                 )
-                VALUES 
+                VALUES
                 (
                   1, FROM_UNIXTIME({$time}), FROM_UNIXTIME({$time}),
-                  0, {$logentry_type}, '{$logentry}', 
+                  0, {$logentry_type}, '{$logentry}',
                   1, 1
                 )";
 
