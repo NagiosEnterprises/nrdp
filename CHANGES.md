@@ -1,3 +1,7 @@
+2.0.6 - ??/??/2021
+------------------
+- Fixed service check timed out after 0.00 seconds on Naemon installations (#61) (ccztux)
+
 2.0.5 - 10/14/2021
 ------------------
 - Updated jQuery to version 3.6.0 -JO
