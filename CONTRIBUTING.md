@@ -12,7 +12,7 @@ with the Nagios Support Team via the
 
 Not to say that you **can't** open an Issue - but you'll likely get a much faster
 response by posting it on the forum.
-
+my changes
 ## Ideas
 
 If you have an idea your best bet is to open an Issue. This gets it on the radar much
