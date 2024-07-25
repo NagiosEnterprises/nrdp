@@ -1,3 +1,7 @@
+2.0.6 - XX/XX/2024
+------------------
+- Make sure tabs aren't mistakenly added to the output file of nrdp_write_check_output_to_cmd - (tsadpbb)
+
 2.0.5 - 10/14/2021
 ------------------
 - Updated jQuery to version 3.6.0 -JO
