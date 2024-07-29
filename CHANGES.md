@@ -1,3 +1,7 @@
+2.0.6 - xx/xx/xxxx
+------------------
+- Fixes for deprecations in PHP 8.2
+
 2.0.5 - 10/14/2021
 ------------------
 - Updated jQuery to version 3.6.0 -JO
