@@ -1,4 +1,4 @@
-2.0.6 - XX/XX/2024
+2.0.6 - 08/01/2024
 ------------------
 - Make sure tabs aren't mistakenly added to the output file of nrdp_write_check_output_to_cmd - (tsadpbb)
 - Fixes for deprecations in PHP 8.2
