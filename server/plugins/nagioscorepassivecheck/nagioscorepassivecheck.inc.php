@@ -244,9 +244,11 @@ function nrdp_write_check_output_to_cmd($hostname, $servicename, $state, $output
                 _debug("unable to change group on {$check_file} to {$command_group}");
             }
         }
-    }
-    else {
-        _debug("nagios_command_group={$command_group} does not exist, not chgrp()ing");
+        else {
+	        _debug("nagios_command_group={$command_group} does not exist, not chgrp()ing");
+        }
+    } else {
+		_debug("posix_getgrnam() does not exist, not chgrp()ing. Consider installing/enabling the php posix extension.");
     }
 
 
