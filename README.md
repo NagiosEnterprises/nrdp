@@ -1,7 +1,7 @@
 NRDP 2.x
 ========
 
-![Nagios!](https://www.nagios.com/wp-content/uploads/2015/05/Nagios-Black-500x124.png)
+![Nagios!](https://raw.githubusercontent.com/NagiosEnterprises/nagioscore/refs/heads/master/html/images/Nagios-clearbg.png)
 
 NRDP (Nagios Remote Data Processor) is a simple, PHP-based passive result collector for use with Nagios. It is designed to be a flexible data transport mechanism and processor, with a simple and powerful architecture that allows for it to be easily extended and customized to fit individual users' needs.
 
@@ -11,15 +11,15 @@ By default, NRDP has the capability of allowing remote agents, applications, and
 Installation
 ============
 
-The KB article "Installing NRDP From Source" has more detailed instuctions that apply to many operating systems:
-https://support.nagios.com/kb/article.php?id=602
+The article "Installing NRDP From Source" has more detailed instuctions that apply to many operating systems:
+https://library.nagios.com/docs/NRDP/installation/NRDP-Installing-NRDP-From-Source
 
 Download the latest tarball and extract to start the install:
 
 ```
 cd /tmp
-wget https://github.com/NagiosEnterprises/nrdp/archive/2.0.5.tar.gz
-tar xvf 2.0.5.tar.gz
+wget https://github.com/NagiosEnterprises/nrdp/archive/2.0.6.tar.gz
+tar xvf 2.0.6.tar.gz
 cd nrdp-*
 ```
 
@@ -36,7 +36,7 @@ Edit the NRDP server config file and add your token to the `$cfg['authorized_tok
 ```
 vi /usr/local/nrdp/server/config.inc.php
 ```
-    
+
 Configure Apache depending on the current Apache version and operating system. If you're using a newer version of Apache you may need to change this file slightly. This has been tested to work with CentOS 6 and 7:
 
 ```
@@ -80,8 +80,8 @@ Client Scripts
 --------------
 
 The client scripts that are distributed with NRDP in the `clients` folder are clearly documented. They are basically a wrapper script for submitting a http post request.
-More detailed usage examples can be found in the "send_nrdp Client" KB article:
-https://support.nagios.com/kb/article.php?id=599
+More detailed usage examples can be found in the "send_nrdp Client" article:
+https://library.nagios.com/docs/NRDP/getting-started/NRDP-send_nrdp-Client
 
 Here is a service example with a WARNING state:
 
