@@ -316,10 +316,10 @@ function display_form()
 
                 <ul class="nav nav-tabs" id="action-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="command-tab" data-toggle="tab" href="#command" role="tab" aria-controls="command" aria-selected="true">Submit Nagios Command</a>
+                        <a class="nav-link active" id="command-tab" data-bs-toggle="tab" href="#command" role="tab" aria-controls="command" aria-selected="true">Submit Nagios Command</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="checkresult-tab" data-toggle="tab" href="#checkresult" role="tab" aria-controls="checkresult" aria-selected="false">Submit Check Result</a>
+                        <a class="nav-link" id="checkresult-tab" data-bs-toggle="tab" href="#checkresult" role="tab" aria-controls="checkresult" aria-selected="false">Submit Check Result</a>
                     </li>
                 </ul>
 
@@ -355,10 +355,10 @@ function display_form()
 
                         <ul class="nav nav-tabs" id="crtype-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="xml-tab" data-toggle="tab" href="#xml" role="tab" aria-controls="xml" aria-selected="true">XML Check Result</a>
+                                <a class="nav-link active" id="xml-tab" data-bs-toggle="tab" href="#xml" role="tab" aria-controls="xml" aria-selected="true">XML Check Result</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="json-tab" data-toggle="tab" href="#json" role="tab" aria-controls="json" aria-selected="false">JSON Check Result</a>
+                                <a class="nav-link" id="json-tab" data-bs-toggle="tab" href="#json" role="tab" aria-controls="json" aria-selected="false">JSON Check Result</a>
                             </li>
                         </ul>
 
