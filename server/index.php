@@ -157,8 +157,8 @@ function display_form()
 <head>
     <title>Nagios Remote Data Processor</title>
     <script type="text/javascript" src="includes/jquery-3.6.0.min.js"></script>
-    <link href="includes/bootstrap-4.6.0.min.css" rel="stylesheet" />
-    <script type="text/javascript" src="includes/bootstrap-4.6.0.bundle.min.js"></script>
+    <link href="includes/bootstrap-5.3.8.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="includes/bootstrap-5.3.8.bundle.min.js"></script>
     <style>
         body {
             margin: 2em 0;
